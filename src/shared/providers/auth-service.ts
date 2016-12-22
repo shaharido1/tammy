@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
-import { AuthProviders, FirebaseAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import { Injectable, Inject } from '@angular/core';
+import { AuthProviders, FirebaseAuth, FirebaseAuthState, AuthMethods, FirebaseListObservable, AngularFire } from 'angularfire2';
 import { EmailPasswordCredentials } from './../../../node_modules/angularfire2/auth/auth_backend.d'
-import { AngularFire, FirebaseListObservable } from 'angularfire2'
 
 @Injectable()
 export class AuthService {
-
-  constructor(public firebaseAuth: FirebaseAuth, public angularFire: AngularFire) { }
-
+  constructor(public firebaseAuth: FirebaseAuth, public angularFire : AngularFire ) {
+   }
+   //on @inject
+   //@Inject(DataService) dataService: DataService
+   //http://blog.thoughtram.io/angular/2015/09/17/resolve-service-dependencies-in-angular-2.html
+  
   createUser(user): firebase.Promise<FirebaseAuthState> {
     return new Promise((resolve, reject) => {
       this.firebaseAuth.createUser({ email: user.email, password: user.password })

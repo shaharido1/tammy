@@ -28,7 +28,7 @@ export class SignUpPage implements OnInit {
     private loadingController: LoadingController,
     private formBuilder: FormBuilder) {
 
-    this.schoolList = [{name : "ido"}, {name : "itai"}, {name : "shahar"}]
+    this.schoolList = [{name : "ido"}, {name : "ido"}, {name : "ido"}]
   }
 
   ngOnInit() {
@@ -64,14 +64,14 @@ export class SignUpPage implements OnInit {
   }
 
   onSuccess(authdata) {
-    // console.log("the userdata" + authdata)
-    // let toastSuccess = this.toastController.create({
-    //   message: "new user created",
-    //   duration: 3000,
-    //   position: 'bottom',
-    //   dismissOnPageChange: true
-    // })
-    // toastSuccess.present()
+    console.log("the userdata" + authdata)
+    let toastSuccess = this.toastController.create({
+      message: "new user created",
+      duration: 3000,
+      position: 'bottom',
+      dismissOnPageChange: true
+    })
+    toastSuccess.present()
     this.navCtrl.setRoot(TabsPage)
   }
 

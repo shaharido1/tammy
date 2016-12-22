@@ -1,21 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
+import {auth} from 'firebase'
+import { AngularFire, FirebaseListObservable } from 'angularfire2'
+import 'rxjs/add/operator/map';
 import { IThread, IComment } from '/interfaces';
 
 declare var firebase: any;
 
 @Injectable()
 export class DataService {
-    private databaseRef: any = firebase.database();
-    private usersRef: any = firebase.database().ref('users');
-    private threadsRef: any = firebase.database().ref('cards');
-    private commentsRef: any = firebase.database().ref('comments');
-    private storageRef: any = firebase.storage().ref()
-    private connectionRef: any = firebase.database().ref('.info/connected');
+    connectionRef: any
     public connected: boolean = false;
 
-    constructor() {
+    constructor(public angularFire: AngularFire) {
+        this.connectionRef = this.angularFire.database.object('.info/connected')
         try {
             this.checkFirebaseConnection();
             /*
@@ -49,7 +47,24 @@ export class DataService {
             }
     }
 
-    getUsers() {
-        this.usersRef.once
+    addNewUser(user){
+       return this.angularFire.database.list('users').push(user)
     }
+
+    getAllpossibleCards() {
+         debugger
+         return this.angularFire.database.list('cards')
+    }
+    
+    getAllpossibleUsers() {
+         return this.angularFire.database.list('users')
+    }
+
+    deleteAllCards() {
+    return this.angularFire.database.list('cards').remove()
+  }
+
+  getCardsOfUser(){
+      return this.angularFire.database.list('cards')
+  }
 }

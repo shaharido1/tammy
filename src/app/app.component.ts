@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import {DataService, AuthService} from './../shared/providers/providers'
-import {LoginPage, SignUpPage, TabsPage} from './../pages/pages';
+import {LoginPage, SignUpPage, TabsPage, AdminCardsPage, AboutPage} from './../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -15,12 +15,14 @@ export class MyApp implements OnInit {
 
   constructor(public platform: Platform, 
               public authService :AuthService,
+              public dataService : DataService,
               public menu: MenuController
              ) {
     this.initializeApp();
 
     this.pages = [
-      { title: 'Page Two', component: "Page2" }
+      { title: 'home', component: TabsPage},
+      { title: 'about', component: AboutPage}
     ];
 
   }
@@ -33,8 +35,10 @@ export class MyApp implements OnInit {
   }
 
   ngOnInit() {
-    debugger
     if (this.authService.isSignedIn) {
+        if (this.authService.getUser()) {
+          this.pages.push({title: "admin-cards", component: AdminCardsPage})
+        }
         this.menu.close()
         this.rootPage = TabsPage
       }
