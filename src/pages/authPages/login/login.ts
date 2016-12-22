@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, ToastController, LoadingController } from 'ionic-angular';
-import { AuthService} from './../../../shared/providers/providers'
-import {SignUpPage, TabsPage } from './../../pages'
+import { AuthService } from './../../../shared/providers/providers'
+import { SignUpPage, TabsPage } from './../../pages'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import {EmailValidator } from './../../../shared/validator/email.validator'
+import { EmailValidator } from './../../../shared/validator/email.validator'
 
 @Component({
   selector: 'LoginPage',
@@ -20,7 +20,7 @@ export class LoginPage implements OnInit {
     private authService: AuthService,
     private toastController: ToastController,
     private loadingController: LoadingController,
-    private formBuilder : FormBuilder) { }
+    private formBuilder: FormBuilder) { }
 
   ngOnInit() {
     this.logInForm = this.formBuilder.group({
@@ -36,50 +36,53 @@ export class LoginPage implements OnInit {
   //////////////////////////////////
 
   onSubmitLogIn(logInfilledForm) {
-    //this.loader = this.loadingController.create({ content: "loging in..." })
-    //this.loader.present();
+    //var loader = this.loadingController.create({ content: "loging in...", dismissOnPageChange: true })
+    //loader.present();
     this.authService.login({
       email: logInfilledForm.email,
       password: logInfilledForm.password
     })
-      .then( (authdata)=> 
-      {
-        this.onSuccess(authdata)
-        this.navCtrl.setRoot(TabsPage)
-      })
-      .catch( (err) => this.onFail(err))
+      .then((auth) => this.onSuccess(auth)) 
+        //(authdata) => {
+      //this.onSuccess(authdata)
+      //loader.dismiss()
+      //this.navCtrl.setRoot(TabsPage)
+      .catch((err) => this.onFail(err))
   }
-  
-    onSuccess (authdata) {
-        console.log (authdata)
-        
-        // let toastSuccess = this.toastController.create({
-        //   message: "loged in succussfuly",
-        //   duration: 3000,
-        //   position: 'bottom',
-        // })
-        //toastSuccess.present()
-        //self.loader.dismiss()
-    }
 
-    onFail (err) {
-        console.log(err)
-        let errMessage : string;
-        errMessage = (err.code=="auth/user-not-found")? "this user doesn't" : "fail to log in"
-        let toasterror = this.toastController.create({
-          message: errMessage,
-          duration: 3000,
-          position: 'bottom'
-        })
-        toasterror.present()
-        this.loader.dismiss()
-    }
+  onSuccess(authdata) {
+    // console.log(authdata)
+    //!!!!!!!!!!!!!!!!!!some wired bug with the loader....!!!!!!!!!!1
 
-    toTabPage() {
-        this.navCtrl.setRoot(TabsPage)
-    }
+    // let toastSuccess = this.toastController.create({
+    //   message: "loged in succussfuly",
+    //   duration: 3000,
+    //   position: 'bottom',
+    //   dismissOnPageChange: true
+    // })
+    // toastSuccess.present()
+    
+    this.navCtrl.setRoot(TabsPage)
+    
+  }
 
-  
+  onFail(err) {
+    console.log(err)
+    let errMessage: string;
+    errMessage = (err.code == "auth/user-not-found") ? "this user doesn't" : "fail to log in"
+    let toasterror = this.toastController.create({
+      message: errMessage,
+      duration: 3000,
+      position: 'bottom'
+    })
+    toasterror.present()
+  }
+
+  toTabPage() {
+    this.navCtrl.setRoot(TabsPage)
+  }
+
+
   goToSignUpPage() {
     this.navCtrl.push(SignUpPage)
   }

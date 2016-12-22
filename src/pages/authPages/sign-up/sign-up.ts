@@ -20,7 +20,7 @@ export class SignUpPage implements OnInit {
   dateOfBirth: AbstractControl;
   phone: AbstractControl;
   school: AbstractControl;
-  schoolList: Array<String>;
+  schoolList: Array<any>;
 
   constructor(public navCtrl: NavController,
     private authService: AuthService,
@@ -28,7 +28,7 @@ export class SignUpPage implements OnInit {
     private loadingController: LoadingController,
     private formBuilder: FormBuilder) {
 
-    this.schoolList = ['a', 'b', 'c']
+    this.schoolList = [{name : "ido"}, {name : "itai"}, {name : "shahar"}]
   }
 
   ngOnInit() {
@@ -50,8 +50,9 @@ export class SignUpPage implements OnInit {
   }
 
   onSignUpSubmit(filledAccountForm) {
-    this.loader = this.loadingController.create({ content: "regestiring" })
-    this.loader.present();
+    //this.loader = this.loadingController.create({ content: "regestiring" })
+    //this.loader.present();
+    ///////////some wired bug with the loader/////////
     this.authService.createUser({
       email: filledAccountForm.email,
       password: filledAccountForm.password,
@@ -63,15 +64,14 @@ export class SignUpPage implements OnInit {
   }
 
   onSuccess(authdata) {
-    console.log("the userdata" + authdata)
-    let toastSuccess = this.toastController.create({
-      message: "new user created",
-      duration: 3000,
-      position: 'bottom',
-      dismissOnPageChange: true
-    })
-    toastSuccess.present()
-    this.loader.dismiss()
+    // console.log("the userdata" + authdata)
+    // let toastSuccess = this.toastController.create({
+    //   message: "new user created",
+    //   duration: 3000,
+    //   position: 'bottom',
+    //   dismissOnPageChange: true
+    // })
+    // toastSuccess.present()
     this.navCtrl.setRoot(TabsPage)
   }
 
@@ -83,7 +83,6 @@ export class SignUpPage implements OnInit {
       position: 'bottom'
     })
     toasterror.present()
-    this.loader.dismiss()
   }
 
 

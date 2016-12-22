@@ -7,7 +7,7 @@ import { NavController, NavParams } from 'ionic-angular';
 })
 export class CardsPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {debugger}
+  constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad CardsPage');

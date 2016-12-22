@@ -14,7 +14,7 @@ export class TabsPage {
     public profilePage: any;
 
     constructor(public navCtrl: NavController, 
-        public events: Events) {debugger
+        public events: Events) {
         // this tells the tabs component which Pages
         // should be each tab's root Page
         this.cardsPage = CardsPage;
