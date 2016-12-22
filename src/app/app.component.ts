@@ -33,6 +33,7 @@ export class MyApp implements OnInit {
   }
 
   ngOnInit() {
+    debugger
     if (this.authService.isSignedIn) {
         this.menu.close()
         this.rootPage = TabsPage
@@ -44,5 +45,11 @@ export class MyApp implements OnInit {
 
   openPage(page) {
     this.nav.setRoot(page.component);
+  }
+
+  signout() {
+    this.authService.logOutUser()
+    this.menu.close()
+    this.nav.setRoot(LoginPage)
   }
 }

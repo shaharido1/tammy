@@ -6,14 +6,26 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2'
 @Injectable()
 export class AuthService {
 
-  constructor(public firebaseAuth: FirebaseAuth, public angularFire: AngularFire) {}
+  constructor(public firebaseAuth: FirebaseAuth, public angularFire: AngularFire) { }
 
-  createUser(cradentials): firebase.Promise<FirebaseAuthState> {
+  createUser(user): firebase.Promise<FirebaseAuthState> {
     return new Promise((resolve, reject) => {
-      this.firebaseAuth.createUser(cradentials).then(() => {
-        this.angularFire.database.list('users').push({ email: cradentials.email })
-        resolve()
-      }).catch((err) => reject(err))
+      this.firebaseAuth.createUser({ email: user.email, password: user.password })
+        .then(() => {
+          console.log("user auth success")
+          this.angularFire.database.list('users').push(user)
+            .then((auth) => {
+              console.log("user save in DB" + auth)
+              resolve(auth)
+            })
+            .catch((err) => {
+              console.log("user fail to save in DB" + err)
+              reject(err)
+            })
+        }).catch((err) => {
+            console.log("fail to auth" + err)
+            reject(err)
+        })
     })
   }
 

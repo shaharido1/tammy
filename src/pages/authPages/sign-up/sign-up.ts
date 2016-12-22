@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, ToastController, LoadingController } from 'ionic-angular';
 import { AuthService } from './../../../shared/providers/providers'
 import { TabsPage } from './../../pages'
@@ -56,15 +56,14 @@ export class SignUpPage implements OnInit {
       email: filledAccountForm.email,
       password: filledAccountForm.password,
       school: filledAccountForm.school,
-      phone: filledAccountForm.phone,
       username: filledAccountForm.username
     })
-      .then(this.onSuccess)
-      .catch(this.onFail)
+      .then( (authdata)=> this.onSuccess(authdata))
+      .catch( (err) => this.onFail(err))
   }
 
   onSuccess(authdata) {
-    console.log(authdata)
+    console.log("the userdata" + authdata)
     let toastSuccess = this.toastController.create({
       message: "new user created",
       duration: 3000,
@@ -73,7 +72,7 @@ export class SignUpPage implements OnInit {
     })
     toastSuccess.present()
     this.loader.dismiss()
-    this.navCtrl.popToRoot(TabsPage)
+    this.navCtrl.setRoot(TabsPage)
   }
 
   onFail(err) {

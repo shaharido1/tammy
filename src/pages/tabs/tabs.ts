@@ -7,16 +7,20 @@ import { AuthService } from '../../shared/services/auth.service';
     templateUrl: 'tabs.html'
 })
 export class TabsPage {
-    @ViewChild('forumTabs') tabRef: Tabs;
+    @ViewChild('Tabs') 
+    
+    tabRef: Tabs;
     public cardsPage: any;
     public profilePage: any;
 
     constructor(public navCtrl: NavController, 
-        public events: Events) {
+        public events: Events) {debugger
         // this tells the tabs component which Pages
         // should be each tab's root Page
         this.cardsPage = CardsPage;
         this.profilePage = ProfilePage;
     }
+
+    PageClicked(){}
 
 }

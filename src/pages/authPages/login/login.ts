@@ -36,38 +36,47 @@ export class LoginPage implements OnInit {
   //////////////////////////////////
 
   onSubmitLogIn(logInfilledForm) {
-    this.loader = this.loadingController.create({ content: "loging in..." })
-    this.loader.present();
+    //this.loader = this.loadingController.create({ content: "loging in..." })
+    //this.loader.present();
     this.authService.login({
       email: logInfilledForm.email,
       password: logInfilledForm.password
     })
-      .then(this.onSuccess)
-      .catch(this.onFail)
+      .then( (authdata)=> 
+      {
+        this.onSuccess(authdata)
+        this.navCtrl.setRoot(TabsPage)
+      })
+      .catch( (err) => this.onFail(err))
   }
   
     onSuccess (authdata) {
         console.log (authdata)
-        let toastSuccess = this.toastController.create({
-          message: "loged in succussfuly",
-          duration: 3000,
-          position: 'bottom',
-          dismissOnPageChange: true
-        })
-        toastSuccess.present()
-        this.loader.dismiss()
-        this.navCtrl.popToRoot(TabsPage)
+        
+        // let toastSuccess = this.toastController.create({
+        //   message: "loged in succussfuly",
+        //   duration: 3000,
+        //   position: 'bottom',
+        // })
+        //toastSuccess.present()
+        //self.loader.dismiss()
     }
 
     onFail (err) {
         console.log(err)
+        let errMessage : string;
+        errMessage = (err.code=="auth/user-not-found")? "this user doesn't" : "fail to log in"
         let toasterror = this.toastController.create({
-          message: "fail to log in",
+          message: errMessage,
           duration: 3000,
           position: 'bottom'
         })
         toasterror.present()
         this.loader.dismiss()
+    }
+
+    toTabPage() {
+        this.navCtrl.setRoot(TabsPage)
     }
 
   
