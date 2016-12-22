@@ -1,0 +1,36 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>log in page</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="logInForm" (ngSubmit)="onSubmitLogIn(logInForm.value)">
+    <ion-list>
+      <ion-list-header>welcome! log in!</ion-list-header>
+      <!--email-->
+      <ion-item [class.error]="!email.valid && email.touched">
+        <ion-label floating>Email address</ion-label>
+        <ion-input type="text" value="" [formControl]="email"></ion-input>
+      </ion-item>
+        <div *ngIf="email.hasError('required') && email.touched" class="error-box">* Email is required.</div>
+        <div *ngIf="email.hasError('isValid') && email.touched" class="error-box">* Enter a valid email address.</div>
+
+      <!--password-->
+      <ion-item [class.error]="!password.valid && password.touched">
+        <ion-label floating>Password</ion-label>
+        <ion-input type="password" value="" [formControl]="password"></ion-input>
+      </ion-item>
+        <div *ngIf="password.hasError('required') && password.touched" class="error-box">* Password is required.</div>
+        <div *ngIf="password.hasError('minlength') && password.touched" class="error-box">* Minimum password length is 5 char.</div>
+  
+      <button ion-button type="submit" class="custom-button" [disabled]="!logInForm.valid" block>log in</button>
+      <button ion-button (click)="goToSignUpPage()">new user? sign up!</button>
+    </ion-list>
+  </form>
+
+
+</ion-content>

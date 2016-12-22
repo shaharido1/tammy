@@ -1,0 +1,4 @@
+<ion-tabs #forumTabs [selectedIndex]="0" (click)="PageClicked()">
+    <ion-tab tabIcon="chatboxes" #content tabTitle="Threads" [root]="cardsPage"></ion-tab>
+    <ion-tab tabIcon="person" #content tabTitle="Profile" [root]="profilePage"></ion-tab>
+</ion-tabs> 

@@ -1,0 +1,59 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>signUp</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="createAccountForm" (ngSubmit)="onSignUpSubmit(createAccountForm.value)">
+    <ion-list>
+      <ion-list-header>צור משתמש חדש</ion-list-header>
+
+      <!--email-->
+      <ion-item [class.error]="!email.valid && email.touched">
+        <ion-label floating>Email address</ion-label>
+        <ion-input type="text" value="" [formControl]="email"></ion-input>
+      </ion-item>
+
+      <div *ngIf="email.hasError('required') && email.touched" class="error-box">* Email is required.</div>
+      <div *ngIf="email.hasError('isValid') && email.touched" class="error-box">* Enter a valid email address.</div>
+
+      <!--password-->
+      <ion-item [class.error]="!password.valid && password.touched">
+        <ion-label floating>Password</ion-label>
+        <ion-input type="password" value="" [formControl]="password"></ion-input>
+      </ion-item>
+      <div *ngIf="password.hasError('required') && password.touched" class="error-box">* Password is required.</div>
+      <div *ngIf="password.hasError('minlength') && password.touched" class="error-box">* Minimum password length is 5 char.</div>
+
+      <!--username-->
+      <ion-item [class.error]="!username.valid && username.touched">
+        <ion-label floating>Username</ion-label>
+        <ion-input type="text" value="" [formControl]="username"></ion-input>
+      </ion-item>
+      <div *ngIf="username.hasError('required') && username.touched" class="error-box">* Username is required.</div>
+      <div *ngIf="username.hasError('minlength') && username.touched" class="error-box">* Minimum username length is 8 char.</div>
+
+      <!--phone-->
+      <ion-item [class.error]="!phone.valid && phone.touched">
+        <ion-label floating>phone</ion-label>
+        <ion-input type="text" value="" [formControl]="phone"></ion-input>
+      </ion-item>
+      <div *ngIf="phone.hasError('required') && phone.touched" class="error-box">* phone is required.</div>
+      <div *ngIf="phone.hasError('minlength') && phone.touched" class="error-box">* Minimum phone length is 10 digits.</div>
+
+      <!--school-->
+
+      <ion-item [class.error]="!phone.valid && phone.touched">
+        <ion-label floating>school</ion-label>
+        <ion-select [formControl]="school" name="school">school</ion-select>
+        <ion-option *ngFor="let scl of schoolList" value="scl">{{scl}}</ion-option>
+      </ion-item>
+      <div *ngIf="phone.hasError('required') && phone.touched" class="error-box">* school is required.</div>
+      <button ion-button type="submit" class="custom-button" [disabled]="!createAccountForm.valid" block>signUp!</button>
+    </ion-list>
+  </form>
+</ion-content>
