@@ -3,18 +3,18 @@ import { NavController, NavParams, ToastController } from 'ionic-angular';
 import { ICard, categories } from './../../../../shared/interfaces'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { RegisterUserToCardPage, AdminCardsPage } from './../../../pages'
-import {DataService} from './../../../../shared/providers/providers'
+import { DataService } from './../../../../shared/providers/providers'
 @Component({
   selector: 'page-create-or-update-card',
   templateUrl: 'create-or-update-card.html'
 })
 export class CreateOrUpdateCardPage implements OnInit {
   updateOrSave: Boolean = true;
-  
-  categories : Array<boolean>
+
+  categories: Array<boolean>
   cardForm: FormGroup;
   title: AbstractControl
-  category : AbstractControl
+  category: AbstractControl
   card: ICard = {
     AllocatedUsers: [],
     category: categories.CATEGORYA,
@@ -31,9 +31,11 @@ export class CreateOrUpdateCardPage implements OnInit {
   ngOnInit() {
     this.dataService.getAllCategories().subscribe(res => {
       console.log(res)
-      this.categories=res
+      this.categories = res
     })
-    this.navParams.data.title? this.card = this.navParams.data : this.updateOrSave = false
+    this.navParams.data.title ?
+      this.card = this.navParams.data
+      : this.updateOrSave = false
 
     this.cardForm = this.formBuilder.group({
       'title': ['', Validators.compose([Validators.required])],
@@ -41,16 +43,16 @@ export class CreateOrUpdateCardPage implements OnInit {
     });
 
     for (let field in this.cardForm.value) {
-      this.cardForm.patchValue({[field]: this.card[field]})
+      this.cardForm.patchValue({ [field]: this.card[field] })
       this[field] = this.cardForm.controls[field]
     }
   }
 
-saveUpdateCard(filledSchoolForm) {
+  saveUpdateCard(filledSchoolForm) {
     for (let field in filledSchoolForm) {
       this.card[field] = filledSchoolForm[field]
     }
-    
+
     //validate that there is no name like it
     this.updateOrSave ?
       this.dataService.updateCard(this.card)
@@ -82,7 +84,7 @@ saveUpdateCard(filledSchoolForm) {
     toastfail.present()
   }
 
- 
+
 }
 
 

@@ -9,7 +9,6 @@ export class AuthService {
 
   createUser(user): firebase.Promise<FirebaseAuthState> {
     return new Promise((resolve, reject) => {
-      if (this.checkThatEmailUnique(user.email)) {
         this.angularFire.auth.createUser({ email: user.email, password: user.password })
           .then(() => {
             console.log("user auth success")
@@ -20,19 +19,9 @@ export class AuthService {
             console.log("fail to auth" + err)
             reject(err)
           })
-      }
-      else reject(ErrorMesseges.emailAlreadyExist)
     })
   }
 
-  private checkThatEmailUnique(emailToValidate): boolean {
-    this.angularFire.database.list('users')
-      .subscribe((res) => res
-        .map((user) => {
-          if (user.email == emailToValidate) { return false }
-        }))
-    return true
-  }
 
   private registerUserToDataBase(user): firebase.Promise<any> {
     return this.angularFire.database.object(`users/${user.username}`)

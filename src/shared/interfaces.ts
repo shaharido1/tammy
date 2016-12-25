@@ -60,5 +60,14 @@ export class FileItem {
 
 export class ErrorMesseges {
     public static premissonDenied: string = "Error: PERMISSION_DENIED: Permission denied"
-    public static emailAlreadyExist: string = "emailAlreadyExist"
+    public static emailAlreadyExist: string = "Error: The email address is already in use by another account."
+    
+}
+
+export class Paths {
+    public static users: string = "users"
+    public static cards: string = "cards"
+    public static schools: string = "schools"
+    public static categories: string ="categories"
+    public static infoConnected: string = ".info/connected"
 }

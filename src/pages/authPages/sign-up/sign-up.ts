@@ -44,14 +44,9 @@ export class SignUpPage implements OnInit {
     }
 
     this.dataService.getAllSchools().subscribe( 
-      (res) => this.schoolList=res,
+      (res) => {this.schoolList=res; console.log(res)},
       (err)=>console.log(err))
-    // // this.email = this.createAccountForm.controls['email'];
-    // // this.password = this.createAccountForm.controls['password'];
-    // // this.username = this.createAccountForm.controls['username'];
-    // // this.school = this.createAccountForm.controls['school'];
-    // // this.phone = this.createAccountForm.controls['phone'];
-
+  
   }
 
   onSignUpSubmit(filledAccountForm) {
@@ -82,9 +77,10 @@ export class SignUpPage implements OnInit {
   }
 
   onFail(err) {
-    
+    debugger
     console.log(err)
     let errMessage: string;
+    //need to handle errors...
     switch(err) {
     case ErrorMesseges.premissonDenied: errMessage = "username might already exists"; break
     case ErrorMesseges.emailAlreadyExist: errMessage= "email already exists"; break;

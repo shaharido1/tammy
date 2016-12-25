@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFire, FirebaseListObservable } from 'angularfire2'
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/find';
-
-import { IThread, IComment } from '/interfaces';
+import {Paths} from './../interfaces';
 
 declare var firebase: any;
 
@@ -15,17 +14,12 @@ export class DataService {
     public connected: boolean = false;
 
     constructor(public angularFire: AngularFire) {
-        this.connectionRef = this.angularFire.database.object('.info/connected')
-        this.schools = this.angularFire.database.list('schools')
-        this.categories = this.angularFire.database.list('categories')
+        console.log("entered service constructor")
+        this.connectionRef = this.angularFire.database.object(Paths.infoConnected)
+        this.schools = this.angularFire.database.list(Paths.schools)
+        this.categories = this.angularFire.database.list(Paths.categories)
         try {
             this.checkFirebaseConnection();
-            /*
-            self.storageRef.child('images/default/profile.png').getDownloadURL().then(function (url) {
-                self.defaultImageUrl = url.split('?')[0] + '?alt=media';
-            });
-            */
-            //hard code one thread
         } catch (error) {
             console.log('Firebase: No connection:' + error);
         }
@@ -49,44 +43,32 @@ export class DataService {
             this.connected = false;
         }
     }
-    ///////////////////////users///////////////////////////
-    /////////////get/////////////
+///////////////////////////////////////users////////////////////////////////////
     getAllUsers() {
-        return this.angularFire.database.list('users')
-    }
-    ///////////set///////////////
-    addNewUser(user) {
-        return this.angularFire.database.list('users').push(user)
+        return this.angularFire.database.list(Paths.users)
     }
 
-    //////////////////////////////////cards////////////////////////////////////////////////////
+    //sign up/add new user -> from the auth service//
+
+    updateUser(user) : firebase.Promise<any>{
+        return this.angularFire.database.list(Paths.users).update(user.$key, user)
+    }
+
+///////////////////////////////////cards////////////////////////////////////////////////////
     getAllCards() {
-        debugger
-        return this.angularFire.database.list('cards')
+        return this.angularFire.database.list(Paths.cards)
     }
 
     getCardsOfUser(userID: any) {
-        return this.angularFire.database.list('cards')
+        return this.angularFire.database.list(Paths.cards)
     }
 
     deleteAllCards() {
-        return this.angularFire.database.list('cards').remove()
-    }
-
-
-    saveCardImage(cardID, cardurl) {
-        return this.angularFire.database.object(`cards\ ${cardID}`).set({ cardURL: cardurl })
+        return this.angularFire.database.list(Paths.cards).remove()
     }
 
     updateCard(cardToUpdate): Promise<any> {
         return new Promise((resolve, reject) => {
-            debugger
-            this.angularFire.database.list('cards').map(card => {
-                debugger
-                console.log(card)
-                //if (card.title == cardToUpdate && scl.$key!=cardToUpdate.$key) {
-                //cardsct("same name"cards           }
-            })
             this.schools.update(cardToUpdate.$key, {
                 name: cardToUpdate.name,
             })
@@ -97,7 +79,7 @@ export class DataService {
 
     saveNewCard(cardToSave) {
         return new Promise((resolve, reject) => {
-            this.angularFire.database.list('cards').map(scl => {
+            this.angularFire.database.list(Paths.cards).map(scl => {
                 debugger
                 console.log(scl)
                 //if (card.name == schoolToSave) {
@@ -105,7 +87,7 @@ export class DataService {
                 //}
             })
 
-            this.angularFire.database.list('cards')
+            this.angularFire.database.list(Paths.cards)
                 .push(cardToSave)
                 .then(res => resolve(res))
                 .catch(err => reject(err))
@@ -134,7 +116,7 @@ export class DataService {
 
     saveNewSchool(schoolToSave) {
         return new Promise((resolve, reject) => {
-            this.angularFire.database.object(`schools/${schoolToSave.$key}`).set({flag : true})
+            this.angularFire.database.object(`${Paths.schools}/ ${schoolToSave.$key}`).set({flag : true})
                 .then(() => resolve())
                 .catch(err => reject(err))
         })

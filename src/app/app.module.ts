@@ -6,7 +6,7 @@ import {AngularFireModule} from 'angularfire2'
 import {firebaseConfig, DefulatfireBaseAuthAnonConfig} from './firebase.config';
 import {LoginPage, SignUpPage, TabsPage, CardsPage, 
         ProfilePage, RegisterUserToCardPage, AdminCardsPage, 
-        AboutPage, CreateOrUpdateCardPage, SchoolListPage, SchoolDetailPage} from './../pages/pages';
+        AboutPage, CreateOrUpdateCardPage, SchoolListPage, SchoolDetailPage, userDetailPage, UsersListPage} from './../pages/pages';
 import {DataService, AuthService, StorageService} from './../shared/providers/providers'
 
 
@@ -23,7 +23,9 @@ import {DataService, AuthService, StorageService} from './../shared/providers/pr
     AboutPage, 
     CreateOrUpdateCardPage,
     SchoolListPage, 
-    SchoolDetailPage
+    SchoolDetailPage,
+    userDetailPage,
+    UsersListPage
 
   ],
   imports: [
@@ -36,7 +38,8 @@ import {DataService, AuthService, StorageService} from './../shared/providers/pr
   entryComponents: [
     MyApp, LoginPage, SignUpPage, TabsPage, CardsPage, 
     ProfilePage, RegisterUserToCardPage, AdminCardsPage, 
-    AboutPage, CreateOrUpdateCardPage, SchoolListPage, SchoolDetailPage
+    AboutPage, CreateOrUpdateCardPage, SchoolListPage, SchoolDetailPage,
+    userDetailPage, UsersListPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, DataService, AuthService, StorageService]
 })

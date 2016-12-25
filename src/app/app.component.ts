@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import {DataService, AuthService} from './../shared/providers/providers'
-import {LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, AllUsersPage} from './../pages/pages';
+import {LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, UsersListPage} from './../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -42,7 +42,7 @@ export class MyApp implements OnInit {
           this.adminPages=[];
           this.adminPages.push({title: "admin-cards", component: AdminCardsPage, icon:'build'}, 
                           {title: "admin-schools", component: SchoolListPage, icon: 'build'},
-                          {title: "admin-users", component: AllUsersPage, icon: 'build'})
+                          {title: "admin-users", component: UsersListPage, icon: 'build'})
           this.admin=true;
         }
         this.menu.close()
