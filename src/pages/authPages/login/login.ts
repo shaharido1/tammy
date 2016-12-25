@@ -10,12 +10,12 @@ import { EmailValidator } from './../../../shared/validator/email.validator'
   templateUrl: 'Login.html'
 })
 export class LoginPage implements OnInit {
-
-  logInForm: FormGroup;
-  email: AbstractControl;
-  password: AbstractControl;
   loader: any
 
+  logInForm: FormGroup;
+  email: AbstractControl
+  password: AbstractControl
+  
   constructor(public navCtrl: NavController,
     private authService: AuthService,
     private toastController: ToastController,
@@ -27,13 +27,11 @@ export class LoginPage implements OnInit {
       'email': ['', Validators.compose([Validators.required, EmailValidator.isValid])],
       'password': ['', Validators.compose([Validators.required, Validators.minLength(5)])]
     });
+    for (let field in this.logInForm.value) {  
+      this[field] = this.logInForm.controls[field]
+    }
 
-    this.email = this.logInForm.controls['email'];
-    this.password = this.logInForm.controls['password'];
   }
-
-
-  //////////////////////////////////
 
   onSubmitLogIn(logInfilledForm) {
     //var loader = this.loadingController.create({ content: "loging in...", dismissOnPageChange: true })
@@ -42,7 +40,7 @@ export class LoginPage implements OnInit {
       email: logInfilledForm.email,
       password: logInfilledForm.password
     })
-      .then((auth) => this.onSuccess(auth)) 
+      .then((auth) =>  this.navCtrl.setRoot(TabsPage)) 
         //(authdata) => {
       //this.onSuccess(authdata)
       //loader.dismiss()
@@ -51,19 +49,15 @@ export class LoginPage implements OnInit {
   }
 
   onSuccess(authdata) {
-    // console.log(authdata)
+     console.log(authdata)
     //!!!!!!!!!!!!!!!!!!some wired bug with the loader....!!!!!!!!!!1
-
-    // let toastSuccess = this.toastController.create({
-    //   message: "loged in succussfuly",
-    //   duration: 3000,
-    //   position: 'bottom',
-    //   dismissOnPageChange: true
-    // })
-    // toastSuccess.present()
-    
-    this.navCtrl.setRoot(TabsPage)
-    
+    let toastSuccess = this.toastController.create({
+      message: "loged in succussfuly",
+      duration: 3000,
+      position: 'bottom',
+      dismissOnPageChange: true
+    })
+    toastSuccess.present()    
   }
 
   onFail(err) {

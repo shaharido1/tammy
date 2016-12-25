@@ -22,7 +22,7 @@ export class RegisterUserToCardPage {
       content: "loading class list"
     })
     loader.present(
-      this.dataService.getAllpossibleUsers()
+      this.dataService.getAllUsers()
         .subscribe((res) => {
           this.allUsers = res
           this.mapcardsForTuggole()

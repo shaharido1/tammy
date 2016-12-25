@@ -1,18 +1,35 @@
-<!--
-  Generated template for the About page.
-
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
   <ion-navbar>
-    <ion-title>create</ion-title>
+    <ion-title>create/update card</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+  <form [formGroup]="cardForm" (ngSubmit)="saveUpdateCard(cardForm.value)">
+    <ion-list>
+      <ion-list-header>card detail</ion-list-header>
+      <!--title -->
+      <ion-item [class.error]="!title.valid && title.touched">
+        <ion-label floating>card title</ion-label>
+        <ion-input type="text" value="{{title.value}}" [formControl]="title"></ion-input>
+      </ion-item>
+        <ion-item *ngIf="title.hasError('required') && title.touched" class="error-box">* title is required.</ion-item>
+        <ion-item *ngIf="title.hasError('isValid') && title.touched" class="error-box">* Enter a valid title address.</ion-item>
+      
+      <!--category -->
+      <ion-item [class.error]="!category.valid && category.touched">
+        <ion-label floating>category</ion-label>
+        <ion-select [formControl]="category" name="category">category
+        <ion-option *ngFor="let cat of categories" value="{{cat.$key}}">{{cat}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <div *ngIf="category.hasError('required') && category.touched" class="error-box">* category is required.</div>
+
+      <button ion-button type="submit" class="custom-button" [disabled]="!cardform.valid" block>save card -> allocate users</button>
+    </ion-list>
+  </form>
 
 </ion-content>

@@ -1,0 +1,34 @@
+<ion-header>
+
+  <ion-navbar>
+    <button menuToggle ion-button icon-only>
+            <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>class-list</ion-title>
+
+  </ion-navbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
+    </ion-searchbar>
+     <ion-row>
+        <button ion-button (click)="pushToSchoolDetailPage()">add new school</button>
+        <button ion-button (click)="deleteClassList()">remove all list</button>
+      </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-refresher (ionRefresh)="refreshAll($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list>
+    <ion-list-header>
+      list of schools 
+    </ion-list-header>
+    <button *ngFor="let scl of filterSchoolList" ion-item (click)="editClass($event, scl)">{{scl.$key}}
+      </button>
+  </ion-list>
+
+</ion-content>

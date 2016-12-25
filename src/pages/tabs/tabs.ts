@@ -1,7 +1,7 @@
 import {Component, ViewChild } from '@angular/core';
 import { NavController, Events, Tabs } from 'ionic-angular';
 import {CardsPage, ProfilePage} from './../pages'
-import { AuthService } from '../../shared/services/auth.service';
+//import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
     templateUrl: 'tabs.html'

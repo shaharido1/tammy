@@ -47,13 +47,15 @@
 
       <!--school-->
 
-      <ion-item [class.error]="!phone.valid && phone.touched">
+      <ion-item [class.error]="!school.valid && school.touched">
         <ion-label floating>school</ion-label>
-        <ion-select [formControl]="school" name="school">school</ion-select>
-        <ion-option *ngFor="let scl of schoolList" value="scl">{{scl.name}}</ion-option>
+        <ion-select [formControl]="school" name="school">school
+        <ion-option *ngFor="let scl of schoolList" value="{{scl.$key}}">{{scl.$key}}</ion-option>
+        </ion-select>
       </ion-item>
-      <div *ngIf="phone.hasError('required') && phone.touched" class="error-box">* school is required.</div>
+      <div *ngIf="school.hasError('required') && school.touched" class="error-box">* school is required.</div>
       <button ion-button type="submit" class="custom-button" [disabled]="!createAccountForm.valid" block>signUp!</button>
     </ion-list>
   </form>
+
 </ion-content>

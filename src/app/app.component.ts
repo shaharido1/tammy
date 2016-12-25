@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import {DataService, AuthService} from './../shared/providers/providers'
-import {LoginPage, SignUpPage, TabsPage, AdminCardsPage, AboutPage} from './../pages/pages';
+import {LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, AllUsersPage} from './../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -11,7 +11,9 @@ export class MyApp implements OnInit {
   @ViewChild(Nav) nav: Nav;
 
   rootPage: any;
-  pages: Array<{title: string, component: any}>;
+  admin: boolean = false;
+  adminPages: Array<{title: string, component: any, icon: string}>;
+  userPages: Array<{title: string, component: any, icon: string}>;
 
   constructor(public platform: Platform, 
               public authService :AuthService,
@@ -20,9 +22,9 @@ export class MyApp implements OnInit {
              ) {
     this.initializeApp();
 
-    this.pages = [
-      { title: 'home', component: TabsPage},
-      { title: 'about', component: AboutPage}
+    this.userPages = [
+      { title: 'home', component: TabsPage, icon:'school'},
+      { title: 'about', component: AboutPage, icon: 'information-circle'}
     ];
 
   }
@@ -37,7 +39,11 @@ export class MyApp implements OnInit {
   ngOnInit() {
     if (this.authService.isSignedIn) {
         if (this.authService.getUser()) {
-          this.pages.push({title: "admin-cards", component: AdminCardsPage})
+          this.adminPages=[];
+          this.adminPages.push({title: "admin-cards", component: AdminCardsPage, icon:'build'}, 
+                          {title: "admin-schools", component: SchoolListPage, icon: 'build'},
+                          {title: "admin-users", component: AllUsersPage, icon: 'build'})
+          this.admin=true;
         }
         this.menu.close()
         this.rootPage = TabsPage
