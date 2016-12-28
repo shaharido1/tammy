@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import {DataService} from './../../../../shared/providers/providers'
 import {SchoolDetailPage} from './../../../pages'
-
+import {ISchool} from './../../../../shared/interfaces'
 @Component({
   selector: 'page-school-list',
   templateUrl: 'school-list.html'
 })
 export class SchoolListPage implements OnInit {
-  schoolList : any;
-  filterSchoolList: any
+  schoolList : Array<ISchool>;
+  filterSchoolList: Array<ISchool>
   queryText: string = ""
   constructor(public navCtrl: NavController, 
               public dataService : DataService,
@@ -38,7 +38,7 @@ export class SchoolListPage implements OnInit {
   searchList() {
      debugger
      this.filterSchoolList = this.schoolList.filter((scl) => {
-       if (!this.queryText || scl.$key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
+       if (!this.queryText || scl.key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
               return scl
       })
   }

@@ -27,7 +27,7 @@
     <ion-list-header>
       list of schools 
     </ion-list-header>
-    <button *ngFor="let scl of filterSchoolList" ion-item (click)="editClass($event, scl)">{{scl.$key}}
+    <button *ngFor="let scl of filterSchoolList" ion-item (click)="editClass($event, scl)">{{scl.name}}
       </button>
   </ion-list>
 

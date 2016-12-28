@@ -1,8 +1,8 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
-import {DataService, AuthService} from './../shared/providers/providers'
-import {LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, UsersListPage} from './../pages/pages';
+import { DataService, AuthService } from './../shared/providers/providers'
+import { LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, UsersListPage } from './../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -12,19 +12,19 @@ export class MyApp implements OnInit {
 
   rootPage: any;
   admin: boolean = false;
-  adminPages: Array<{title: string, component: any, icon: string}>;
-  userPages: Array<{title: string, component: any, icon: string}>;
+  adminPages: Array<{ title: string, component: any, icon: string }>;
+  userPages: Array<{ title: string, component: any, icon: string }>;
 
-  constructor(public platform: Platform, 
-              public authService :AuthService,
-              public dataService : DataService,
-              public menu: MenuController
-             ) {
+  constructor(public platform: Platform,
+    public authService: AuthService,
+    public dataService: DataService,
+    public menu: MenuController
+  ) {
     this.initializeApp();
 
     this.userPages = [
-      { title: 'home', component: TabsPage, icon:'school'},
-      { title: 'about', component: AboutPage, icon: 'information-circle'}
+      { title: 'home', component: TabsPage, icon: 'school' },
+      { title: 'about', component: AboutPage, icon: 'information-circle' }
     ];
 
   }
@@ -37,21 +37,20 @@ export class MyApp implements OnInit {
   }
 
   ngOnInit() {
-    if (this.authService.isSignedIn) {
-        if (this.authService.getUser()) {
-          this.adminPages=[];
-          this.adminPages.push({title: "admin-cards", component: AdminCardsPage, icon:'build'}, 
-                          {title: "admin-schools", component: SchoolListPage, icon: 'build'},
-                          {title: "admin-users", component: UsersListPage, icon: 'build'})
-          this.admin=true;
-        }
-        this.menu.close()
-        this.rootPage = TabsPage
-      }
+    //later will verifay admin//
+    if (this.authService.getUser()) {
+      this.adminPages = [];
+      this.adminPages.push({ title: "manage cards", component: AdminCardsPage, icon: 'albums' },
+        { title: "manage schools", component: SchoolListPage, icon: 'book' },
+        { title: "manage users", component: UsersListPage, icon: 'people' })
+      this.admin = true;
+      this.menu.close()
+      this.rootPage = TabsPage
+    }
     else {
-        this.rootPage = LoginPage
-      }
-  }  
+      this.rootPage = LoginPage
+    }
+  }
 
   openPage(page) {
     this.nav.setRoot(page.component);

@@ -1,22 +1,25 @@
 import { Injectable } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2'
+import { AngularFire, FirebaseListObservable, FirebaseRef } from 'angularfire2'
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/find';
-import {Paths} from './../interfaces';
-
-declare var firebase: any;
-
+import 'rxjs/add/operator/isEmpty';
+import { Observable } from 'rxjs/Observable';
+import { Paths, IUser, IRefCard, IRefUser, ICard, ISchool } from './../interfaces';
+import { MappingService } from './mapping.service'
+import * as _ from 'lodash'
 @Injectable()
 export class DataService {
     connectionRef: any
     schools: FirebaseListObservable<any>
     categories: FirebaseListObservable<any>
+    root: any
+    usersRef: any
     public connected: boolean = false;
 
-    constructor(public angularFire: AngularFire) {
-        console.log("entered service constructor")
+    constructor(private angularFire: AngularFire) {
+        console.log("entered data service")
+        this.root = this.angularFire.database.object(Paths.root)
         this.connectionRef = this.angularFire.database.object(Paths.infoConnected)
-        this.schools = this.angularFire.database.list(Paths.schools)
         this.categories = this.angularFire.database.list(Paths.categories)
         try {
             this.checkFirebaseConnection();
@@ -43,22 +46,60 @@ export class DataService {
             this.connected = false;
         }
     }
-///////////////////////////////////////users////////////////////////////////////
-    getAllUsers() {
+    ///////////////////////////////////////users////////////////////////////////////
+    getAllUsers(): Observable<any> {
         return this.angularFire.database.list(Paths.users)
+            .map((res) => {
+                return res.map(user => {
+                    return MappingService.mapUserfromDbToApp(user)
+                })
+            })
     }
 
     //sign up/add new user -> from the auth service//
 
-    updateUser(user) : firebase.Promise<any>{
-        return this.angularFire.database.list(Paths.users).update(user.$key, user)
+    updateUser(user: IUser, oldCardAllocation?: Array<IRefCard>): firebase.Promise<any> {
+        let upref = {}
+        let userToSet = MappingService.mapUserfromAppToDb(user)
+        upref[`${Paths.users}/${user.key}`] = userToSet
+        if (typeof oldCardAllocation !== 'undefined') {
+            Object.assign(upref, this.updateCardUserList(user, oldCardAllocation))
+        }
+        return this.root.update(upref)
     }
 
-///////////////////////////////////cards////////////////////////////////////////////////////
-    getAllCards() {
+
+    private updateCardUserList(user: IUser, oldCardAllocation): Object {
+        let upRef = {}
+        _.differenceBy(oldCardAllocation, user.allocatedCards, "key")
+            .map((cardToRemoveUser) => {
+                upRef[`${Paths.cards}/${cardToRemoveUser.key}/${Paths.allocatedUsers}/${user.key}`] = null
+            })
+        _.differenceBy(user.allocatedCards, oldCardAllocation, "key")
+            .map((cardToAddUser) => {
+                upRef[`${Paths.cards}/${cardToAddUser.key}/${Paths.allocatedUsers}/${user.key}`] = { fullname: user.fullName }
+            })
+        return upRef
+    }
+
+
+
+    //set() -> destructive update, oppose to update()
+
+
+    deleteAllUsers(): firebase.Promise<any> {
+        return this.angularFire.database.list(Paths.users).remove()
+    }
+
+    ///////////////////////////////////cards////////////////////////////////////////////////////
+    getAllCards(): Observable<any> {
         return this.angularFire.database.list(Paths.cards)
+            .map((res) => {
+                return res.map(card => {
+                return MappingService.mapCardfromDbToApp(card)
+                })
+            })
     }
-
     getCardsOfUser(userID: any) {
         return this.angularFire.database.list(Paths.cards)
     }
@@ -67,66 +108,41 @@ export class DataService {
         return this.angularFire.database.list(Paths.cards).remove()
     }
 
-    updateCard(cardToUpdate): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.schools.update(cardToUpdate.$key, {
-                name: cardToUpdate.name,
-            })
-                .then(() => resolve("success"))
-                .catch(err => reject(err))
-        })
+ 
+    updateCard(cardToUpdate) : firebase.Promise<void> {
+        return this.angularFire.database.object(`${Paths.cards}/${cardToUpdate.key}`)
+              .set({name: cardToUpdate.name})
     }
 
-    saveNewCard(cardToSave) {
-        return new Promise((resolve, reject) => {
-            this.angularFire.database.list(Paths.cards).map(scl => {
-                debugger
-                console.log(scl)
-                //if (card.name == schoolToSave) {
-                //    reject("same name")
-                //}
-            })
-
-            this.angularFire.database.list(Paths.cards)
-                .push(cardToSave)
-                .then(res => resolve(res))
-                .catch(err => reject(err))
-        })
+    saveNewCard(cardToSave: ICard): firebase.Promise<void> {
+        return this.angularFire.database.list(`${Paths.cards}`).push(cardToSave)
     }
 
 
     ///////////////////////////schools//////////////////////////////////////////////////////////
-    getAllSchools(): FirebaseListObservable<any> {
-        return this.schools
-    }
-
-    updateSchool(schoolToUpdate): Promise<any> {
-        return new Promise((resolve, reject) => {
-            // this.schools.subscribe(res => res.map((scl) => {
-            //     if (scl.name == schoolToUpdate && scl.$key != schoolToUpdate.$key)
-            //         reject("same name")
-            // }))
-            this.schools.update(schoolToUpdate.$key, {
-                $key: schoolToUpdate.$key,
+    getAllSchools(): Observable<any> {
+        return this.angularFire.database.list(Paths.schools)
+            .map((res) => {
+                return res.map(school => {
+                return MappingService.mapSchoolfromDbToApp(school)
+                })
             })
-                .then(() => resolve("success"))
-                .catch(err => reject(err))
-        })
     }
 
-    saveNewSchool(schoolToSave) {
-        return new Promise((resolve, reject) => {
-            this.angularFire.database.object(`${Paths.schools}/ ${schoolToSave.$key}`).set({flag : true})
-                .then(() => resolve())
-                .catch(err => reject(err))
-        })
+    updateSchool(schoolToUpdate) : firebase.Promise<void> {
+        return this.angularFire.database.object(`${Paths.schools}/${schoolToUpdate.key}`)
+              .set({name: schoolToUpdate.name})
+    }
+
+    saveNewSchool(schoolToSave: ISchool): firebase.Promise<any> {
+        return this.angularFire.database.list(`${Paths.schools}`).push({ name: schoolToSave.name })
     }
 
     removeAllSchools(): firebase.Promise<any> {
-        return this.schools.remove()
+        return this.angularFire.database.list(Paths.schools).remove()
     }
 
-    ///////////////////////////schools//////////////////////////////////////////////////////////
+    ///////////////////////////categories//////////////////////////////////////////////////////////
 
     getAllCategories() {
         return this.categories
@@ -135,3 +151,25 @@ export class DataService {
     }
 
 }
+
+
+
+
+    // private checkIfExists(key: string): Promise<any> {
+    //     let prom = new Promise((reject, resolve) => {
+    //         let check = this.angularFire.database.object(`${Paths.cards}/${key}`).subscribe((res) => {
+    //             if (res) {
+    //                 console.log(res)
+    //                 if (res.$exists()) {
+    //                     debugger
+    //                     console.log("title already exists")
+    //                     reject("title already exists")
+    //                 }
+    //                 else {
+    //                     console.log("title don't exists")
+    //                     resolve()
+    //                 }
+    //             }
+    //         })
+    //     })
+    // }

@@ -1,61 +1,54 @@
 
-export interface IUser {
-    name: String;
-    surname: String;
-    userid: String;
-    School: Schools;
-    email: String;
-    phone: String;
-    Allocatedcards: Array<IRefCard>;
-    counterComments: Number;
-    commants: Array<IComments>
+export class IUser {
+    key: string; //this is the Uid from the auth 
+    firstName: string;
+    lastName: string;
+    username: string; 
+    school: ISchool;
+    email: string;
+    phone: string;
+    allocatedCards?: Array<IRefCard> 
+    counterComments?: Number
+    commants?: Array<IComments>
+    fullName: string;
 }
 
-export interface Schools {
-    $key: string
+export interface ISchool {
+    key: string
+    name : string
 }
 
 export interface IRefCard {
-    title: String
-    key: String
+    key: string
+    name: string
 }
 
 export interface IRefUser {
-    userid: String
-    key: String
+    key: string 
+    fullName: string
+
 }
 
 export interface IComments {
-    key?: String
+    key?: string
     userDetails?: IRefUser
     cardDetails?: IRefCard
-    title: String
-    contnet: String
+    name: string
+    contnet: string
 }
 
 export interface ICard {
-    title: String;
+    key: string
+    name: string;
     category: categories;
-    UrlToFile: String
-    AllocatedUsers: Array<IRefUser>
+    urlToFile: string
+    allocatedUsers: Array<IRefUser>
     commants: Array<IComments>
-    $key?: string
 }
 
-export enum categories {
-    CATEGORYA, CATEGORYB, CATEGORYC
-}
-
-export class FileItem {
-
-    public file: File;
-    public url: string = '';
-    public isUploading: boolean = false;
-    public progress: number = 0;
-
-    public constructor(file: File) {
-        this.file = file;
-    }
+export interface categories {
+    key : string
+    name : string
 }
 
 export class ErrorMesseges {
@@ -64,10 +57,14 @@ export class ErrorMesseges {
     
 }
 
+import {databaseRootUrl} from './../app/firebase.config'
 export class Paths {
+    public static root: string = databaseRootUrl
     public static users: string = "users"
     public static cards: string = "cards"
     public static schools: string = "schools"
     public static categories: string ="categories"
     public static infoConnected: string = ".info/connected"
+    public static allocatedUsers: string ="allocatedUsers"
+    public static allocatedCards: string = "allocatedCards"
 }

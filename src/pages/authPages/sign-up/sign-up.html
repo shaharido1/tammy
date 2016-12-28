@@ -12,10 +12,24 @@
     <ion-list>
       <ion-list-header>צור משתמש חדש</ion-list-header>
 
+      <!--firstName-->
+      <ion-item [class.error]="!firstName.valid && firstName.touched">
+        <ion-label floating>first Name</ion-label>
+        <ion-input type="text" value="" [formControl]="firstName"></ion-input>
+      </ion-item>
+      <div *ngIf="firstName.hasError('required') && firstName.touched" class="error-box">* firstName is required.</div>
+    
+      <!--lastName-->
+      <ion-item [class.error]="!lastName.valid && lastName.touched">
+        <ion-label floating>last Name</ion-label>
+        <ion-input type="text" value="" [formControl]="lastName"></ion-input>
+      </ion-item>
+      <div *ngIf="lastName.hasError('required') && lastName.touched" class="error-box">* lastName is required.</div>
+     
       <!--email-->
       <ion-item [class.error]="!email.valid && email.touched">
         <ion-label floating>Email address</ion-label>
-        <ion-input type="text" value="" [formControl]="email"></ion-input>
+        <ion-input type="email" value="" [formControl]="email"></ion-input>
       </ion-item>
 
       <div *ngIf="email.hasError('required') && email.touched" class="error-box">* Email is required.</div>
@@ -31,10 +45,10 @@
 
       <!--username-->
       <ion-item [class.error]="!username.valid && username.touched">
-        <ion-label floating>Username</ion-label>
+        <ion-label floating>username</ion-label>
         <ion-input type="text" value="" [formControl]="username"></ion-input>
       </ion-item>
-      <div *ngIf="username.hasError('required') && username.touched" class="error-box">* Username is required.</div>
+      <div *ngIf="username.hasError('required') && username.touched" class="error-box">* username is required.</div>
       <div *ngIf="username.hasError('minlength') && username.touched" class="error-box">* Minimum username length is 8 char.</div>
 
       <!--phone-->
@@ -50,7 +64,7 @@
       <ion-item [class.error]="!school.valid && school.touched">
         <ion-label floating>school</ion-label>
         <ion-select [formControl]="school" name="school">school
-        <ion-option *ngFor="let scl of schoolList" value="{{scl.$key}}">{{scl.$key}}</ion-option>
+        <ion-option *ngFor="let scl of schoolList" value="{{scl.name}}">{{scl.name}}</ion-option>
         </ion-select>
       </ion-item>
       <div *ngIf="school.hasError('required') && school.touched" class="error-box">* school is required.</div>

@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
 import { FirebaseAuthState, AngularFire, AngularFireAuth } from 'angularfire2';
 import { EmailPasswordCredentials } from './../../../node_modules/angularfire2/auth/auth_backend.d'
-import {ErrorMesseges} from './../interfaces'
+import {IUser, Paths} from './../interfaces'
 @Injectable()
 export class AuthService {
   constructor(public angularFire: AngularFire) {
   }
-
+///inject firebase - for delete, change password, etc. 
   createUser(user): firebase.Promise<FirebaseAuthState> {
     return new Promise((resolve, reject) => {
-        this.angularFire.auth.createUser({ email: user.email, password: user.password })
-          .then(() => {
+        debugger
+        this.angularFire.auth.createUser({email: user.email, password: user.password })
+          .then((auth) => {
             console.log("user auth success")
-            this.registerUserToDataBase(user)
-              .then(() => resolve("user saved in DB"))
-              .catch((err) => reject(err))
+            this.registerUserToDataBase(user, auth.uid)
+              .then(() => resolve())
+              .catch((err) => reject(err))//if fail to save in db, should delete user as well.. 
           }).catch((err) => {
             console.log("fail to auth" + err)
             reject(err)
@@ -22,13 +23,16 @@ export class AuthService {
     })
   }
 
-
-  private registerUserToDataBase(user): firebase.Promise<any> {
-    return this.angularFire.database.object(`users/${user.username}`)
+  private registerUserToDataBase(user: IUser, uid: string): firebase.Promise<any> {
+    debugger
+    return this.angularFire.database.object(`${Paths.users}/${uid}`)
       .set({
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         phone: user.phone,
-        school: user.school
+        school: user.school,
+        username: user.username
       })
 
   }
@@ -45,7 +49,4 @@ export class AuthService {
     return this.angularFire.auth
   }
 
-  isSignedIn(): boolean {
-    return this.angularFire.auth.getAuth() !== null
-  }
 }

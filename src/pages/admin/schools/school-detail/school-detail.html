@@ -10,12 +10,12 @@
 <form [formGroup]="schoolForm" (ngSubmit)="saveUpdateSchool(schoolForm.value)">
     <ion-list>
       <!--name-->
-      <ion-item [class.error]="!$key.valid && $key.touched">
+      <ion-item [class.error]="!name.valid && name.touched">
         <ion-label floating>name</ion-label>
-        <ion-input type="text" value="{{$key.value}}" [formControl]="$key"></ion-input>
+        <ion-input type="text" value="{{name.value}}" [formControl]="name"></ion-input>
       </ion-item>
-        <div *ngIf="$key.hasError('required') && $key.touched" class="error-box">* name is required.</div>
-        <div *ngIf="$key.hasError('minlength') && $key.touched" class="error-box">* Minimum name length is 5 char.</div>
+        <div *ngIf="name.hasError('required') && name.touched" class="error-box">* name is required.</div>
+        <div *ngIf="name.hasError('minlength') && name.touched" class="error-box">* Minimum name length is 5 char.</div>
   
       <button ion-button type="submit" class="custom-button" [disabled]="!schoolForm.valid" block>{{updateOrSave? "Update" : "Save"}} </button>
     </ion-list>

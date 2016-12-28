@@ -3,7 +3,7 @@ import { NavController, NavParams, ToastController } from 'ionic-angular';
 import { DataService } from './../../../../shared/providers/providers'
 import { SchoolListPage } from './../../../pages'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Schools, IUser, ErrorMesseges } from './../../../../shared/interfaces'
+import { ISchool, ErrorMesseges } from './../../../../shared/interfaces'
 
 @Component({
   selector: 'page-school-detail',
@@ -11,10 +11,10 @@ import { Schools, IUser, ErrorMesseges } from './../../../../shared/interfaces'
 })
 export class SchoolDetailPage implements OnInit {
   updateOrSave: Boolean = true;
-  school: Schools = {$key:""}
+  school: ISchool = {key: "", name: ""}
   //allusers: Array<IUser>
   schoolForm: FormGroup
-  $key: AbstractControl
+  name: AbstractControl
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -24,9 +24,9 @@ export class SchoolDetailPage implements OnInit {
 
 
   ngOnInit() {
-    this.navParams.data.$key ? this.school = this.navParams.data : this.updateOrSave = false
+    this.navParams.data.key ? this.school = this.navParams.data : this.updateOrSave = false
     this.schoolForm = this.formBuilder.group({
-      '$key': ['', Validators.compose([Validators.required, Validators.minLength(5)])]
+      'name': ['', Validators.compose([Validators.required, Validators.minLength(5)])]
     });
     for (let field in this.schoolForm.value) {
       this.schoolForm.patchValue({[field]: this.school[field]})
@@ -41,18 +41,16 @@ export class SchoolDetailPage implements OnInit {
     for (let field in filledSchoolForm) {
       this.school[field] = filledSchoolForm[field]
     }
-    
-    //validate that there is no $key like it
     this.updateOrSave ?
       this.dataService.updateSchool(this.school)
         .then((res) => this.onSuccess(res))
         .catch((err) => this.onFail(err))
       : this.dataService.saveNewSchool(this.school)
-        .then((res) => this.onSuccess(res))
+        .then(() => this.onSuccess())
         .catch((err) => this.onFail(err))
   }
 
-  private onSuccess(res) {
+  private onSuccess(res?) {
     let toastSuccess = this.toastController.create({
       message: this.updateOrSave ? "updated school" : "saved new school",
       duration: 3000,

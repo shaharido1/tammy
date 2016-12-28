@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import {DataService} from './../../../../shared/providers/providers'
 import {userDetailPage} from './../../../pages'
+import {IUser} from './../../.../../../../shared/interfaces'
 
 @Component({
   selector: 'page-user-list',
   templateUrl: 'users-list.html'
 })
 export class UsersListPage implements OnInit {
-  userList : any;
-  filterUserList: any
+  userList : Array<IUser>
+  filterUserList: Array<IUser>
   queryText: string = ""
   
   constructor(public navCtrl: NavController, 
@@ -22,11 +23,11 @@ export class UsersListPage implements OnInit {
     let loader = this.loadingController.create({
       content: "loading users list"
     })
+    this.userList =[]
     loader.present(
       this.dataService.getAllUsers()
         .subscribe((res) => {
-          console.log(res)
-          this.userList = res
+          this.userList=res
           this.filterUserList = this.userList
         },
         (err) => {
@@ -37,7 +38,9 @@ export class UsersListPage implements OnInit {
 
   searchList() {
      this.filterUserList = this.userList.filter((user) => {
-       if (!this.queryText || user.$key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
+       if (!this.queryText || 
+          user.fullName.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()) 
+          )
               return user
       })
   }
@@ -60,7 +63,7 @@ export class UsersListPage implements OnInit {
         {
           text: 'Yes',
           handler: () => {
-            this.dataService.removeAllSchools().then(() => {
+            this.dataService.deleteAllUsers().then(() => {
               this.toastController.create({
                 message: 'You have deleted the entire user list',
                 duration: 2000,

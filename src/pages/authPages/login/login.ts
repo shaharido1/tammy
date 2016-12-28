@@ -4,6 +4,7 @@ import { AuthService } from './../../../shared/providers/providers'
 import { SignUpPage, TabsPage } from './../../pages'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { EmailValidator } from './../../../shared/validator/email.validator'
+import { MyApp } from './../../../app/app.component'
 
 @Component({
   selector: 'LoginPage',
@@ -73,7 +74,7 @@ export class LoginPage implements OnInit {
   }
 
   toTabPage() {
-    this.navCtrl.setRoot(TabsPage)
+    this.navCtrl.setRoot(MyApp)
   }
 
 

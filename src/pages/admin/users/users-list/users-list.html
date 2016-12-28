@@ -24,9 +24,9 @@
 
   <ion-list>
     <ion-list-header>
-      list of schools 
+      list of users 
     </ion-list-header>
-    <button *ngFor="let user of filterUserList" ion-item (click)="editClass($event, user)">{{user.$key}}
+    <button *ngFor="let user of filterUserList" ion-item (click)="editClass($event, user)">{{user.firstName + ' ' + user.lastName}}
       </button>
   </ion-list>
 

@@ -11,19 +11,19 @@
   <form [formGroup]="cardForm" (ngSubmit)="saveUpdateCard(cardForm.value)">
     <ion-list>
       <ion-list-header>card detail</ion-list-header>
-      <!--title -->
-      <ion-item [class.error]="!title.valid && title.touched">
-        <ion-label floating>card title</ion-label>
-        <ion-input type="text" value="{{title.value}}" [formControl]="title"></ion-input>
+      <!--name -->
+      <ion-item [class.error]="!name.valid && name.touched">
+        <ion-label floating>card name</ion-label>
+        <ion-input type="text" value="{{name.value}}" [formControl]="name"></ion-input>
       </ion-item>
-        <ion-item *ngIf="title.hasError('required') && title.touched" class="error-box">* title is required.</ion-item>
-        <ion-item *ngIf="title.hasError('isValid') && title.touched" class="error-box">* Enter a valid title </ion-item>
+        <ion-item *ngIf="name.hasError('required') && name.touched" class="error-box">* name is required.</ion-item>
+        <ion-item *ngIf="name.hasError('isValid') && name.touched" class="error-box">* Enter a valid name </ion-item>
       
       <!--category -->
       <ion-item [class.error]="!category.valid && category.touched">
         <ion-label floating>category</ion-label>
         <ion-select [formControl]="category" name="category">category
-        <ion-option *ngFor="let cat of categories" value="{{cat.$key}}">{{cat.$key}}</ion-option>
+        <ion-option *ngFor="let cat of categories" value="{{cat.name}}">{{cat.name}}</ion-option>
         </ion-select>
       </ion-item>
       <div *ngIf="category.hasError('required') && category.touched" class="error-box">* category is required.</div>

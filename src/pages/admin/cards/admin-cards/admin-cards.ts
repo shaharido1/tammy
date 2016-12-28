@@ -37,7 +37,7 @@ export class AdminCardsPage implements OnInit {
 
   searchList() {
      this.filterCardsList = this.allCardsList.filter((card) => {
-       if (!this.queryText || card.title.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
+       if (!this.queryText || card.name.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
               return card
       })
   }

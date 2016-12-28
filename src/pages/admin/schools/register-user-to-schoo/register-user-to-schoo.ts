@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams, ToastController } from 'ionic-angular';
 import { DataService } from './../../../../shared/providers/providers'
-import { Schools } from './../../../../shared/interfaces'
+import { ISchool } from './../../../../shared/interfaces'
 
 @Component({
   selector: 'page-register-user-to-schoo',
@@ -9,7 +9,7 @@ import { Schools } from './../../../../shared/interfaces'
 })
 export class RegisterUserToSchooPage implements OnInit{
   allUsers
-  school : Schools
+  school : ISchool
   
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
