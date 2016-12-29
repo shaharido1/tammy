@@ -10,11 +10,11 @@
     <button ion-button menuToggle>
         <ion-icon name='menu'></ion-icon>
      </button>
-    <ion-title>all Cards</ion-title>
+    <ion-title>Admin manage cards</ion-title>
   </ion-navbar>
 
 <ion-toolbar>
-    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
+    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="sortCards()">
     </ion-searchbar>
      <ion-row>
          <button ion-button (click)=deleteClassList()>DELETE all cards</button>
@@ -25,5 +25,12 @@
 </ion-header>
 
 <ion-content padding>
-  <button ion-item *ngFor="let card of filterCardsList" (click)="editCard(card)">{{card.name}}</button>
+      <ion-list> 
+        <ion-item-group *ngFor="let category of displayCards ">
+            <ion-item-divider color="secondary" >{{category.categoryName}}</ion-item-divider>
+            <button ion-item *ngFor="let card of category.categoryCards" (click)="editCard($event, card)">
+                {{card.name}}
+            </button>
+        </ion-item-group>
+    </ion-list>
 </ion-content>

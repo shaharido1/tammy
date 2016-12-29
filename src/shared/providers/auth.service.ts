@@ -32,7 +32,10 @@ export class AuthService {
         email: user.email,
         phone: user.phone,
         school: user.school,
-        username: user.username
+        username: user.username,
+        counterComments : 0,
+        allocatedCards : [],
+        commants : []
       })
 
   }

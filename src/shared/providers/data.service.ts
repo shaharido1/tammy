@@ -12,6 +12,7 @@ export class DataService {
     connectionRef: any
     schools: FirebaseListObservable<any>
     categories: FirebaseListObservable<any>
+    cards : FirebaseListObservable<any> //maybe can be removed in full version
     root: any
     usersRef: any
     public connected: boolean = false;
@@ -21,6 +22,7 @@ export class DataService {
         this.root = this.angularFire.database.object(Paths.root)
         this.connectionRef = this.angularFire.database.object(Paths.infoConnected)
         this.categories = this.angularFire.database.list(Paths.categories)
+        this.cards = this.angularFire.database.list(Paths.cards)
         try {
             this.checkFirebaseConnection();
         } catch (error) {
@@ -88,7 +90,16 @@ export class DataService {
 
 
     deleteAllUsers(): firebase.Promise<any> {
-        return this.angularFire.database.list(Paths.users).remove()
+        let upRef = {}
+        let finish : boolean = false
+        upRef[`${Paths.users}`] = null
+        this.cards.subscribe( (res) => {
+            res.map( (card) =>
+            upRef[`${Paths.cards}/${card.key}/${Paths.allocatedUsers}`] = null
+             )
+        }, (err)=> console.log(err), () => finish =true )
+
+        if (finish) return (this.root.update(upRef))
     }
 
     ///////////////////////////////////cards////////////////////////////////////////////////////
@@ -108,16 +119,33 @@ export class DataService {
         return this.angularFire.database.list(Paths.cards).remove()
     }
 
- 
-    updateCard(cardToUpdate) : firebase.Promise<void> {
-        return this.angularFire.database.object(`${Paths.cards}/${cardToUpdate.key}`)
-              .set({name: cardToUpdate.name})
+    updateCard(card: ICard, oldUserAllocation?: Array<IRefUser>): firebase.Promise<any> {
+        let upref = {}
+        let cardToSet = MappingService.mapCardfromAppToDb(card)
+        upref[`${Paths.cards}/${card.key}`] = cardToSet
+        if (typeof oldUserAllocation !== 'undefined') {
+            Object.assign(upref, this.updateUserCardList(card, oldUserAllocation))
+        }
+        return this.root.update(upref)
+    }
+
+    private updateUserCardList(card: ICard, oldCardAllocation): Object {
+        let upRef = {}
+        _.differenceBy(oldCardAllocation, card.allocatedUsers, "key")
+            .map((userToRemoveUser) => {
+                upRef[`${Paths.users}/${userToRemoveUser.key}/${Paths.allocatedCards}/${card.key}`] = null
+            })
+        _.differenceBy(card.allocatedUsers, oldCardAllocation, "key")
+            .map((cardToAddUser) => {
+                upRef[`${Paths.users}/${cardToAddUser.key}/${Paths.allocatedCards}/${card.key}`] = { card: card.name }
+            })
+        return upRef
     }
 
     saveNewCard(cardToSave: ICard): firebase.Promise<void> {
+        cardToSave.key=null
         return this.angularFire.database.list(`${Paths.cards}`).push(cardToSave)
     }
-
 
     ///////////////////////////schools//////////////////////////////////////////////////////////
     getAllSchools(): Observable<any> {

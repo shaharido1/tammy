@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
-import { DataService } from './../../../../shared/providers/data.service'
-import { RegisterUserToCardPage, CreateOrUpdateCardPage } from './../../../pages'
-import {ICard} from './../../../../shared/interfaces'
+import { DataService } from './../../shared/providers/data.service'
+import { RegisterUserToCardPage, CreateOrUpdateCardPage } from './../pages'
+import {ICard} from './../../shared/interfaces'
 import * as _ from 'lodash'
+
 @Component({
-  selector: 'admin-cards',
-  templateUrl: 'admin-cards.html'
+  selector: 'page-all-user-cards',
+  templateUrl: 'all-user-cards.html'
 })
-export class AdminCardsPage implements OnInit {
+
+export class AllUserCardsPage {
   allCards : Array<ICard>
   categorizedCards : Array<any>
   displayCards : Array<ICard> 
@@ -30,7 +32,6 @@ export class AdminCardsPage implements OnInit {
         .subscribe((res) => {
           this.allCards = res
           this.sortCards()
-          //  this.filterCardsList = this.allCardsList
         },
         (err) => {
           console.log(err)
@@ -59,43 +60,6 @@ export class AdminCardsPage implements OnInit {
     this.displayCards = this.categorizedCards
   }
 
-  editCard($event, card) {
-    debugger
-    console.log(card)
-    this.navCtrl.push(CreateOrUpdateCardPage, card)
-  }
-
-  createCard() {
-    this.navCtrl.push(CreateOrUpdateCardPage)
-  }
-
-  deleteClassList() {
-    let confirm = this.alertController.create({
-      title: 'remove all?',
-      message: 'Are you sure you want to remove all cards from the list?',
-      buttons: [
-        {
-          text: 'Yes',
-          handler: () => {
-            this.dataService.deleteAllCards().then(() => {
-              this.toastController.create({
-                message: 'You have delted the entire list',
-                duration: 2000,
-                position: 'bottom'
-              }).present()
-            }).catch(() => {
-              this.toastController.create({
-                message: 'operation faild',
-                duration: 2000,
-                position: 'bottom'
-              }).present()
-            })
-          }
-        },
-        { text: 'No' }
-      ]
-    });
-    confirm.present();
-  }
+  pushToCardDetails($event, card) { }
 
 }

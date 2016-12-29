@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import { DataService, AuthService } from './../shared/providers/providers'
-import { LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, UsersListPage } from './../pages/pages';
+import { LoginPage, TabsPage, AdminCardsPage, AboutPage, SchoolListPage, UsersListPage, AllUserCardsPage } from './../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -23,7 +23,8 @@ export class MyApp implements OnInit {
     this.initializeApp();
 
     this.userPages = [
-      { title: 'home', component: TabsPage, icon: 'school' },
+      { title: 'home', component: TabsPage, icon: 'home' },
+      { title: 'all cards', component: AllUserCardsPage, icon: 'school' },
       { title: 'about', component: AboutPage, icon: 'information-circle' }
     ];
 

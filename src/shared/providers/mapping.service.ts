@@ -43,6 +43,20 @@ static mapUserfromAppToDb(user : IUser)  {
     return userToSet
   }
 
+static mapCardfromAppToDb(card : ICard)  {
+    let userObj={}
+    card.allocatedUsers.map( user => {
+        userObj[user.key]= {fullName: user.fullName}
+    })
+    let cardToSet = {}
+    Object.assign(cardToSet, card)
+    cardToSet["key"]=null
+    cardToSet["allocatedUsers"] = userObj
+    return cardToSet
+  }
+
+
+
   static mapSchoolfromDbToApp(school) : ISchool {
       return ({key: school.$key, name: school.name})
   }
@@ -51,12 +65,19 @@ static mapUserfromAppToDb(user : IUser)  {
         return ({
             key: card.$key, 
             name: card.name,
-            allocatedUsers: card.allocatedUsers? card.allocatedUsers : [],
+            allocatedUsers: card.allocatedUsers? MappingService.arrangeUsersToArray(card.allocatedUsers) : [],
             category: card.category,
             commants: card.commants? card.commants : [],
             urlToFile: card.urlToFile?  card.urlToFile : "" 
      })
 
+  }
+    private static arrangeUsersToArray (allocatedUsers) : Array<IRefUser> {
+      let userArray: Array<IRefUser> = []
+      Object.keys(allocatedUsers).forEach(ky=>{
+              userArray.push({key:ky , fullName: allocatedUsers[ky].fullName})
+          })
+    return userArray
   }
 
 

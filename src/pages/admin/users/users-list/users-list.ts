@@ -3,15 +3,18 @@ import { NavController, LoadingController, ToastController, AlertController } fr
 import {DataService} from './../../../../shared/providers/providers'
 import {userDetailPage} from './../../../pages'
 import {IUser} from './../../.../../../../shared/interfaces'
+import * as _ from 'lodash'
 
 @Component({
   selector: 'page-user-list',
   templateUrl: 'users-list.html'
 })
 export class UsersListPage implements OnInit {
-  userList : Array<IUser>
-  filterUserList: Array<IUser>
+  allUsers: Array<any>
+  categorizedUsers: Array<any>
+  displayUsers: Array<IUser>
   queryText: string = ""
+
   
   constructor(public navCtrl: NavController, 
               public dataService : DataService,
@@ -23,12 +26,11 @@ export class UsersListPage implements OnInit {
     let loader = this.loadingController.create({
       content: "loading users list"
     })
-    this.userList =[]
     loader.present(
       this.dataService.getAllUsers()
         .subscribe((res) => {
-          this.userList=res
-          this.filterUserList = this.userList
+          this.allUsers=res
+          this.sortUsers()
         },
         (err) => {
           console.log(err)
@@ -36,16 +38,27 @@ export class UsersListPage implements OnInit {
     loader.dismiss()
   }
 
-  searchList() {
-     this.filterUserList = this.userList.filter((user) => {
-       if (!this.queryText || 
-          user.fullName.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()) 
-          )
-              return user
-      })
+  sortUsers() {
+    this.categorizedUsers =
+      _.chain(this.allUsers)
+        //for each team in array
+        .filter(user => {
+          if (!this.queryText || user.fullName.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
+            return user
+        })
+        //groupby (array, function/string) -> if string, looking for the same value 
+        .groupBy('school')
+        //create pairs of key and value 
+        .toPairs()
+        //zip -> _.zip(['moe', 'larry', 'curly'], [30, 40, 50], [true, false, false]);
+        //=> [["moe", 30, true], ["larry", 40, false], ["curly", 50, false]]
+        .map(item => _.zipObject(['schoolName', 'schoolUsers'], item))
+        //unwrap the chain value
+        .value();
+    this.displayUsers = this.categorizedUsers
   }
   
-  editClass($event, user) {
+  goToUserDetails($event, user) {
     this.navCtrl.push(userDetailPage, user)
   }
 

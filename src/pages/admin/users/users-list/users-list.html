@@ -4,15 +4,15 @@
     <button menuToggle ion-button icon-only>
             <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>User list</ion-title>
+    <ion-title>Admin manage users</ion-title>
 
   </ion-navbar>
   <ion-toolbar>
-    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
+    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="sortUsers()">
     </ion-searchbar>
-     <ion-row>
-        <button ion-button (click)="deleteUserList()">remove all list</button>
-      </ion-row>
+    <ion-row>
+      <button ion-button (click)="deleteUserList()">remove all list</button>
+    </ion-row>
   </ion-toolbar>
 </ion-header>
 
@@ -23,11 +23,11 @@
   </ion-refresher>
 
   <ion-list>
-    <ion-list-header>
-      list of users 
-    </ion-list-header>
-    <button *ngFor="let user of filterUserList" ion-item (click)="editClass($event, user)">{{user.firstName + ' ' + user.lastName}}
+    <ion-item-group *ngFor="let school of displayUsers ">
+      <ion-item-divider color="secondary">{{school.schoolName}}</ion-item-divider>
+      <button *ngFor="let user of school.schoolUsers" ion-item (click)="goToUserDetails($event, user)">{{user.fullName}}
       </button>
+    </ion-item-group>
   </ion-list>
 
 </ion-content>

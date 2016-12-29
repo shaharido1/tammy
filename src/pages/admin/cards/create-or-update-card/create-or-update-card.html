@@ -3,6 +3,10 @@
   <ion-navbar>
     <ion-title>create/update card</ion-title>
   </ion-navbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="sortUsers()">
+    </ion-searchbar>
+  </ion-toolbar>
 
 </ion-header>
 
@@ -16,19 +20,29 @@
         <ion-label floating>card name</ion-label>
         <ion-input type="text" value="{{name.value}}" [formControl]="name"></ion-input>
       </ion-item>
-        <ion-item *ngIf="name.hasError('required') && name.touched" class="error-box">* name is required.</ion-item>
-        <ion-item *ngIf="name.hasError('isValid') && name.touched" class="error-box">* Enter a valid name </ion-item>
-      
+      <ion-item *ngIf="name.hasError('required') && name.touched" class="error-box">* name is required.</ion-item>
+      <ion-item *ngIf="name.hasError('isValid') && name.touched" class="error-box">* Enter a valid name </ion-item>
+
       <!--category -->
       <ion-item [class.error]="!category.valid && category.touched">
         <ion-label floating>category</ion-label>
         <ion-select [formControl]="category" name="category">category
-        <ion-option *ngFor="let cat of categories" value="{{cat.name}}">{{cat.name}}</ion-option>
+          <ion-option *ngFor="let cat of categories" value="{{cat.name}}">{{cat.name}}</ion-option>
         </ion-select>
       </ion-item>
       <div *ngIf="category.hasError('required') && category.touched" class="error-box">* category is required.</div>
-      <button ion-button type="submit" class="custom-button" [disabled]="!cardForm.valid" block>save card -> allocate users</button>
+      <button ion-button type="submit" class="custom-button" [disabled]="!cardForm.valid" block>{{updateOrSave? "Update" : "Save"}}</button>
     </ion-list>
   </form>
-
+  <!--user -->
+  <ion-list *ngIf="updateOrSave"> 
+    <ion-item-group *ngFor="let school of displayUsers ">
+      <ion-item-divider color="secondary">{{school.schoolName}}</ion-item-divider>
+      <ion-item *ngFor="let user of school.schoolUsers">
+        <ion-label>{{user.fullName}}</ion-label>
+        <ion-toggle [ngModel]="user.checked" (ngModelChange)="pushUserToCard($event, user)"></ion-toggle>
+      </ion-item>
+    </ion-item-group>
+  </ion-list>
+  <h3 *ngIf="!updateOrSave"> to allocate users, please First create card</h3>
 </ion-content>

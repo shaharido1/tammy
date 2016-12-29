@@ -7,36 +7,29 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>User Details</ion-title>
+    <ion-title>Manage {{user.fullName}} details</ion-title>
+    <h4>{{user.fullName}} </h4>
   </ion-navbar>
   <ion-toolbar>
     <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
     </ion-searchbar>
-    <button ion-button (click)="saveUser()">Save user</button>
+    <button ion-button (click)="saveUser()">Update user</button>
   </ion-toolbar>
 
 </ion-header>
 
 
 <ion-content padding>
-
   <ion-list>
     <ion-list-header>
       all cards
     </ion-list-header>
-    <ion-item *ngFor="let card of filterCardList">
-      <ion-label>{{card.name}}</ion-label>
-      <ion-toggle [ngModel]="card.checked" (ngModelChange)="pushCardToUser($event, card)"></ion-toggle>
-    </ion-item>
+    <ion-item-group *ngFor="let category of displayCards ">
+      <ion-item-divider color="secondary">{{category.categoryName}}</ion-item-divider>
+      <ion-item *ngFor="let card of category.categoryCards">
+        <ion-label>{{card.name}}</ion-label>
+        <ion-toggle [ngModel]="card.checked" (ngModelChange)="pushUserToCard($event, card)"></ion-toggle>
+      </ion-item>
+    </ion-item-group>
   </ion-list>
-
-  <ion-list *ngIf="user.allocatedCards">
-    <ion-list-header>
-      allocted to user
-    </ion-list-header>
-    <ion-item *ngFor="let carduser of user.allocatedCards">
-      {{carduser.name}}
-    </ion-item>
-  </ion-list>
-
 </ion-content>
