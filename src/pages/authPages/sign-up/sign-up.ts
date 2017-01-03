@@ -77,7 +77,6 @@ export class SignUpPage implements OnInit {
   }
 
   onFail(err) {
-    debugger
     console.log(err)
     let errMessage: string;
     //need to handle errors...

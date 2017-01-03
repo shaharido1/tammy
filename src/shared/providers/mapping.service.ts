@@ -3,6 +3,7 @@ import { IUser, Paths, IRefUser, IRefCard, ISchool, ICard, IComment, ICommantRef
 
 export class MappingService {
 
+    ////////////////////////////user///////////////////////////////////////////////////////////////
     static mapUserfromDbToApp(user): IUser {
         let userToSet: IUser;
         if (user.allocatedCards) {
@@ -10,8 +11,9 @@ export class MappingService {
         }
         userToSet = {
             allocatedCards: user.allocatedCards ? MappingService.arrangeCardsToArray(user.allocatedCards) : [],
-            commants: user.commants ? user.commants : [],
-            counterComments: user.counterComments ? user.counterComments : 0,
+            commants: user.commants ? MappingService.arrangeCommantsToArray(user.commants) : [],
+            counterComments: user.commants ? Object.keys(user.commants).length : 0,
+            favoriteCards: user.favoriteCards ? MappingService.arrangeCardsToArray(user.favoriteCards) : [],
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
@@ -23,42 +25,26 @@ export class MappingService {
         }
         return userToSet
     }
-    private static arrangeCardsToArray(allocatedCards): Array<IRefCard> {
-        let cardArray: Array<IRefCard> = []
-        Object.keys(allocatedCards).forEach(ky => {
-            cardArray.push({ key: ky, name: allocatedCards[ky].name })
-        })
-        return cardArray
-    }
 
     static mapUserfromAppToDb(user: IUser) {
-        let cardObj = {}
-        user.allocatedCards.map(card => {
-            cardObj[card.key] = { name: card.name }
-        })
         let userToSet = {}
         Object.assign(userToSet, user)
         userToSet["key"] = null
-        userToSet["allocatedCards"] = cardObj
+        userToSet["allocatedCards"] = MappingService.arrangeCardsToObject(user.allocatedCards)
+        userToSet["favoriteCards"] = MappingService.arrangeCardsToObject(user.favoriteCards)
+        userToSet["commants"]=MappingService.arragneCommantToObject(user.commants)
         return userToSet
     }
+    ////////////////////////////cards///////////////////////////////////////////////////////////////
 
     static mapCardfromAppToDb(card: ICard) {
-        let userObj = {}
-        card.allocatedUsers.map(user => {
-            userObj[user.key] = { fullName: user.fullName }
-        })
+
         let cardToSet = {}
         Object.assign(cardToSet, card)
         cardToSet["key"] = null
-        cardToSet["allocatedUsers"] = userObj
+        cardToSet["allocatedUsers"] = MappingService.arrangeUsersToObject(card.allocatedUsers)
+        cardToSet["commants"]=MappingService.arragneCommantToObject(card.commants)
         return cardToSet
-    }
-
-
-
-    static mapSchoolfromDbToApp(school): ISchool {
-        return ({ key: school.$key, name: school.name    })
     }
 
     static mapCardfromDbToApp(card): ICard {
@@ -67,24 +53,13 @@ export class MappingService {
             name: card.name,
             allocatedUsers: card.allocatedUsers ? MappingService.arrangeUsersToArray(card.allocatedUsers) : [],
             category: card.category,
-            commants: card.commants ? card.commants : [],
+            commants: card.commants ? MappingService.arrangeCommantsToArray(card.commants) : [],
             urlToFile: card.urlToFile ? card.urlToFile : ""
         })
 
     }
-    private static arrangeUsersToArray(allocatedUsers): Array<IRefUser> {
-        let userArray: Array<IRefUser> = []
-        Object.keys(allocatedUsers).forEach(ky => {
-            userArray.push({ key: ky, fullName: allocatedUsers[ky].fullName })
-        })
-        return userArray
-    }
 
-
-
-    static userRefToCard(user: IUser): IRefUser {
-        return ({ key: user.key, fullName: user.fullName })
-    }
+    ////////////////////////////commant///////////////////////////////////////////////////////////////
 
     static mapCommantFromDbToApp(commant): IComment {
         return ({
@@ -95,6 +70,67 @@ export class MappingService {
             title: commant.title,
             userDetails: commant.userDetails
         })
+    }
+    ////////////////////////////school///////////////////////////////////////////////////////////////
+
+    static mapSchoolfromDbToApp(school): ISchool {
+        return ({ key: school.$key, name: school.name })
+    }
+    ////////////////////////////references///////////////////////////////////////////////////////////////
+    /////////////users///////////
+    private static arrangeUsersToArray(allocatedUsers): Array<IRefUser> {
+        let userArray: Array<IRefUser> = []
+        Object.keys(allocatedUsers).forEach(ky => {
+            userArray.push({ key: ky, fullName: allocatedUsers[ky].fullName })
+        })
+        return userArray
+    }
+    private static arrangeUsersToObject(userArray: Array<IRefUser>): Object {
+        let userObj = {}
+        userArray.map(user => {
+            userObj[user.key] = { fullName: user.fullName }
+        })
+        return userObj
+    }
+    
+    static userRefToCard(user: IUser): IRefUser {
+        return ({ key: user.key, fullName: user.fullName })
+    }
+
+    /////////////commant///////////
+    private static arrangeCommantsToArray(commants): Array<ICommantRef> {
+        let commantsArray: Array<ICommantRef> = []
+        Object.keys(commants).forEach(ky => {
+            commantsArray.push({ key: ky, title: commants[ky].title })
+        })
+        return commantsArray
+    }
+
+    private static arragneCommantToObject(commantArray: Array<ICommantRef>): Object {
+        let commantObj = {}
+        commantArray.map(commant => {
+            commantObj[commant.key] = { title: commant.title }
+        })
+        return commantObj
+    }
+
+    
+
+    ///////////cards array<>object///////////////////
+    private static arrangeCardsToArray(allocatedCards): Array<IRefCard> {
+        let cardArray: Array<IRefCard> = []
+        Object.keys(allocatedCards).forEach(ky => {
+            cardArray.push({ key: ky, name: allocatedCards[ky].name })
+        })
+        return cardArray
+    }
+
+    private static arrangeCardsToObject(cardArray: Array<IRefCard>): Object {
+        let cardObj = {}
+        cardArray.map(card => {
+            cardObj[card.key] = { name: card.name }
+        })
+        return cardObj
     }
 
 }

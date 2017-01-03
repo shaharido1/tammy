@@ -84,7 +84,6 @@ export class AdminCardDetailsPage implements OnInit {
   mapUsersForTuggole() {
     if (this.card.allocatedUsers) {
       this.allUsers.map(user => {
-        debugger
         user.checked = false;
         for (let i = 0; i < this.card.allocatedUsers.length; i++) {
           if (this.card.allocatedUsers[i].key == user.key) {

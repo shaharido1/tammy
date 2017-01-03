@@ -62,7 +62,6 @@ export class AdminCardsListPage implements OnInit {
   }
 
   editCard($event, card) {
-    debugger
     console.log(card)
     this.navCtrl.push(AdminCardDetailsPage, card)
   }

@@ -3,8 +3,8 @@
   <ion-navbar>
     <ion-title>cardDetails</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only (click)="favorCard()">some
-        <ion-icon name="{{favorite? heart : heart-outline}}"></ion-icon>
+      <button ion-button icon-only (click)="favorCard()">
+        <ion-icon [name]="favorite? 'heart' : 'heart-outline'"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>

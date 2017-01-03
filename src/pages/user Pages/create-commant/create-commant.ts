@@ -60,7 +60,6 @@ export class CreateCommantPage {
           cardDetails: { key: this.card.key, name: this.card.name },
           date: new Date().toString()
         };
-        debugger
         this.dataService.setNewCommant(newComment)
           .then(() => {
             loader.dismiss()

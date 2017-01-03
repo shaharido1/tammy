@@ -11,5 +11,13 @@
 
 
 <ion-content padding>
+    <ion-list>
+      <ion-list-header>
+        favorite cards
+      </ion-list-header>
+      <ion-item *ngFor="let card of favoriteCards">
+        {{card.name}}
+      </ion-item>
+    </ion-list>
 
 </ion-content>

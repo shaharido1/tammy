@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { DataService } from './../../../shared/providers/data.service'
 import { ICard } from './../../../shared/interfaces'
 import * as _ from 'lodash'
 import { CardDetailsPage } from './../../pages'
+import {Subscription} from 'rxjs/Subscription.d'
 
 @Component({
   selector: 'page-all-user-cards',
   templateUrl: 'all-cards-list.html'
 })
 
-export class AllcardsListPage {
+export class AllcardsListPage implements OnInit, OnDestroy {
   allCards: Array<ICard> = []
   categorizedCards: Array<any>
   displayCards: Array<ICard>
   queryText: string = ""
-
+  subscription : Subscription
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public dataService: DataService,
@@ -26,9 +27,8 @@ export class AllcardsListPage {
   ngOnInit() {
 
     this.allCards=[]
-    this.dataService.getListOfCards(true)
+    this.subscription=this.dataService.getListOfCards(true)
       .subscribe((card) => {
-
         this.allCards.push(card)
         this.sortCards()
       },
@@ -36,6 +36,8 @@ export class AllcardsListPage {
         console.log(err)
       })
   }
+  
+  ngOnDestroy(){this.subscription.unsubscribe}
 
 
   sortCards() {

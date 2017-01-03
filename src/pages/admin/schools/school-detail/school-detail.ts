@@ -37,7 +37,6 @@ export class SchoolDetailPage implements OnInit {
   }
 
   saveUpdateSchool(filledSchoolForm) {
-    debugger
     for (let field in filledSchoolForm) {
       this.school[field] = filledSchoolForm[field]
     }

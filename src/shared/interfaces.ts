@@ -75,7 +75,7 @@ export const Paths = {
     allocatedUsers:"allocatedUsers",
     allocatedCards: "allocatedCards",
     commants: "commants",
-    
+    admins: "admins"
 }
 
 export const EventsTypes = {

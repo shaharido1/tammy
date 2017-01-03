@@ -17,7 +17,7 @@ export class AdminUserDetailsPage implements OnInit {
   displayCards: Array<ICard>
   queryText: string = ""
   oldCardAllocation: Array<IRefCard> = []
-
+  isAdmin : boolean = false
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     private toastController: ToastController,
@@ -36,6 +36,7 @@ export class AdminUserDetailsPage implements OnInit {
         console.log(res)
         this.allCards = res
         this.mapCardsForTuggole()
+        this.checkIfAdmin()
         this.sortCards()
       })
     console.log("error")
@@ -44,6 +45,22 @@ export class AdminUserDetailsPage implements OnInit {
 goToCard(card) {
   this.navCtrl.push(AdminCardDetailsPage, card)
 }
+makeAdmin($event){
+  $event? 
+    this.dataService.makeUserAdmin(this.user)
+      .then(()=>this.toastController.create({message:"user is now admin", duration:2000, position: "bottom"}).present())
+      .catch((err)=> console.log(err)) : 
+    this.dataService.removeAdmin(this.user)
+      .then(()=>this.toastController.create({message:"user is now regular user", duration:2000, position: "bottom"}).present())
+      .catch((err) => console.log(err))
+}
+
+checkIfAdmin() {
+  this.dataService.isAdmin(this.user).then((res)=>
+  this.isAdmin=res
+  ).catch((err)=>console.log(err))
+}
+
 mapCardsForTuggole() {
   if (this.user.allocatedCards) {
     this.allCards.map(card => {
@@ -87,7 +104,6 @@ pushUserToCard(event, card) {
 }
 
 saveUser() {
-  debugger
   this.dataService.updateUser(this.user, this.oldCardAllocation)
     .then(() => this.onSuccess())
     .catch((err) => this.onFail(err))

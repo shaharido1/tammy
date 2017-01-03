@@ -23,16 +23,22 @@ export class CardDetailsPage implements OnInit, OnDestroy {
   commantSubscription: Subscription
   favorite: boolean = false;
   user: IUser
+  firstMessage: string
+  secondMessage: string
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public dataService: DataService,
-    public authService : AuthService,
+    public authService: AuthService,
     private loadingController: LoadingController,
     private toastController: ToastController, public events: Events) {
     this.card = this.navParams.data
   }
 
   ngOnInit() {
+    if (this.card.commants) { this.getCardCommant() }
     this.getUser()
+  }
+
+  getCardCommant() {
     this.commantSubscription = this.dataService.getCommantsByList(this.card.commants).subscribe((commant) => {
       console.log(commant)
       this.commants.push(commant)
@@ -53,39 +59,47 @@ export class CardDetailsPage implements OnInit, OnDestroy {
       .catch(err => console.log("problem in auth"))
   }
 
+  checkFavorite() {
+    this.user.favoriteCards.find((card) => {
+      return card.key == this.card.key
+    }) ? this.favorite = true : this.favorite = false
+  }
+
   favorCard() {
-    let loader = this.loadingController.create({ content: "saving card to favorite" })
-    loader.present().then(() => {
-      if (!this.user.favoriteCards) this.user.favoriteCards=[]
+    if (this.favorite) {
+      this.firstMessage = "Removing card from favorites"
+      this.secondMessage = "card succefully removed from favorites"
+      this.user.favoriteCards.filter(card => card.key !== this.card.key)
+    }
+    else {
+      this.firstMessage = "adding card to favorites"
+      this.secondMessage = "card succefully added to favorites"
+      if (!this.user.favoriteCards) { this.user.favoriteCards = [] }
       this.user.favoriteCards.push({ key: this.card.key, name: this.card.name })
+    }
+    let loader = this.loadingController.create({ content: this.firstMessage })
+    loader.present().then(() => {
       this.dataService.updateUser(this.user).then(() => {
-        this.favorite = true
+        this.favorite = !this.favorite
         this.toastController.create({
-          position: "bottom", message: "card saved to favorite", duration: 3000
+          position: "bottom", message: this.secondMessage, duration: 3000
         }).present()
         loader.dismiss().catch((err) => console.log(err))
       })
-    }).catch((err) => console.log(err))
-  }
-
-  checkFavorite() {
-    for (let i = 0; i < this.user.favoriteCards.length; i++) {
-      if (this.user.favoriteCards[i].key == this.card.key) {
-        this.favorite == true
-        break
-      }
-    }
+    }).catch((err) => {
+      this.toastController.create({
+        position: "bottom", message: "error adding/removing card from favorites", duration: 3000
+      }).present()
+      loader.dismiss().catch((err) => console.log(err))
+      console.log(err)
+    })
   }
 
   ngOnDestroy() {
-    this.commants = []
     this.commantSubscription.unsubscribe()
   }
 
-
   createComment() {
-    this.commantSubscription.unsubscribe()
-    this.commants = []
     this.navCtrl.push(CreateCommantPage, this.card)
   }
 

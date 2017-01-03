@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import { DataService } from './../../../../shared/providers/providers'
 import { SchoolDetailPage } from './../../../pages'
 import { ISchool } from './../../../../shared/interfaces'
 import { Observable } from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription.d'
+import 'rxjs/add/operator/filter';
 
 @Component({
   selector: 'page-school-list',
   templateUrl: 'school-list.html'
 })
-export class SchoolListPage implements OnInit {
+export class SchoolListPage implements OnInit, OnDestroy {
   schoolList: Array<ISchool>;
   filterSchoolList: Array<ISchool>
   queryText: string = ""
-  observ : any
+  schoolSub : Subscription
   constructor(public navCtrl: NavController,
     public dataService: DataService,
     private loadingController: LoadingController,
@@ -21,20 +23,21 @@ export class SchoolListPage implements OnInit {
     private alertController: AlertController) { }
 
   ngOnInit() {
-    this.observ=this.dataService.getAllSchools
-    this.dataService.getAllSchools()
+    this.schoolSub= this.dataService.getAllSchools()
       .subscribe((res) => {
         console.log(res)
-        debugger
         this.schoolList = res
         this.filterSchoolList = this.schoolList
       }, (err) => {
         console.log(err)
       })
   }
+  ngOnDestroy() {
+    console.log("unsubscribed from school list")
+    this.schoolSub.unsubscribe()
+  }
 
   searchList() {
-    debugger
     this.filterSchoolList = this.schoolList.filter((scl) => {
       if (!this.queryText || scl.key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
         return scl

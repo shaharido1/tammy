@@ -17,44 +17,45 @@
 <ion-content>
     <div *ngIf="!userDataLoaded">
         <img src="assets/images/ring.gif" style="display:block; margin:auto" />
-    </div>
-    <ion-list no-border *ngIf="userDataLoaded">
-        <ion-list-header>
-            Basic Info
-        </ion-list-header>
-        <ion-item>
-            <ion-thumbnail item-left>
-            </ion-thumbnail>
-            <h2>user.username</h2>
-            <p>user.email</p>
-        </ion-item>
+</div>
+<ion-list no-border *ngIf="user">
+    <ion-list-header>
+        Basic Info
+    </ion-list-header>
+    <ion-item>
+        <ion-thumbnail item-left>
+        </ion-thumbnail>
+        <h2>{{user.username}}</h2>
+        <p>{{user.email}}</p>
+    </ion-item>
 
-        <ion-item>
-            <ion-icon name='cloud-upload' item-left></ion-icon>
-            <ion-note item-right>
-                what is missing here
-            </ion-note>
-        </ion-item>
+    <ion-item>
+        <ion-icon name='cloud-upload' item-left></ion-icon>
+        <ion-note item-right>
+            what is missing here
+        </ion-note>
+    </ion-item>
 
-    </ion-list>
+</ion-list> 
 
 
-    <ion-list *ngIf="userDataLoaded">
+<ion-list *ngIf="user">
 
-        <ion-list-header>
-            Activity
-        </ion-list-header>
+    <ion-list-header>
+        Activity
+    </ion-list-header>
 
-        <ion-item>
-            # Comments
-            <ion-icon name='quote' item-left></ion-icon>
-            <ion-badge item-right>user commants</ion-badge>
-        </ion-item>
-        <ion-item>
-            # Favorites
-            <ion-icon name='heart' item-left></ion-icon>
-            <ion-badge item-right>user fav</ion-badge>
-        </ion-item>
+    <ion-item *ngFor="let commant of user.commants">
+        # Comments
+        <h2>{{commant.name}}</h2>
+        <ion-icon name='quote' item-left></ion-icon>
+        <ion-badge item-right>user commants</ion-badge>
+    </ion-item>
+    <ion-item>
+        # Favorites
+        <ion-icon name='heart' item-left></ion-icon>
+        <ion-badge item-right>user fav</ion-badge>
+    </ion-item>
 
-    </ion-list>
+</ion-list>
 </ion-content>

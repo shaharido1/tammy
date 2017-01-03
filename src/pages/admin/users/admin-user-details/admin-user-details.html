@@ -7,19 +7,24 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Manage {{user.fullName}} details</ion-title>
-    <h4>{{user.fullName}} </h4>
+    <ion-title>Manage details</ion-title>
+    <p>{{user.fullName}} </p>
   </ion-navbar>
   <ion-toolbar>
     <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
     </ion-searchbar>
     <button ion-button (click)="saveUser()">Update user</button>
+    <ion-item>
+      <ion-label>admin</ion-label>
+      <ion-toggle [ngModel]="isAdmin" (ngModelChange)="makeAdmin($event)"></ion-toggle>
+    </ion-item>
   </ion-toolbar>
 
 </ion-header>
 
 
 <ion-content padding>
+
   <ion-list>
     <ion-list-header>
       all cards
