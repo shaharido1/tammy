@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import {IUser} from './../../../shared/interfaces'
+import {IUser} from './../../../../shared/interfaces'
 
 @Component({
   selector: 'page-profile',

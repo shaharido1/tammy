@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
-import { DataService } from './../../shared/providers/data.service'
-import { RegisterUserToCardPage, CreateOrUpdateCardPage } from './../pages'
-import {ICard} from './../../shared/interfaces'
+import { DataService } from './../../../../shared/providers/data.service'
+import { AdminCardDetailsPage } from './../../../pages'
+import {ICard} from './../../../../shared/interfaces'
 import * as _ from 'lodash'
-
 @Component({
-  selector: 'page-all-user-cards',
-  templateUrl: 'all-user-cards.html'
+  selector: 'admin-cards',
+  templateUrl: 'admin-cards-list.html'
 })
-
-export class AllUserCardsPage {
+export class AdminCardsListPage implements OnInit {
   allCards : Array<ICard>
   categorizedCards : Array<any>
   displayCards : Array<ICard> 
@@ -24,19 +22,22 @@ export class AllUserCardsPage {
     private toastController: ToastController) { }
 
   ngOnInit() {
-    let loader = this.loadingController.create({
-      content: "loading cards list"
-    })
-    loader.present(
+    let loader = this.loadingController.create({content: "loading cards list"})
+    loader.present().then( () => {
       this.dataService.getAllCards()
         .subscribe((res) => {
           this.allCards = res
           this.sortCards()
+              loader.dismiss()    
+
+          //  this.filterCardsList = this.allCardsList
         },
         (err) => {
           console.log(err)
-        }))
-    loader.dismiss()
+              loader.dismiss()    
+
+        })
+    })
   }
 
 
@@ -60,6 +61,43 @@ export class AllUserCardsPage {
     this.displayCards = this.categorizedCards
   }
 
-  pushToCardDetails($event, card) { }
+  editCard($event, card) {
+    debugger
+    console.log(card)
+    this.navCtrl.push(AdminCardDetailsPage, card)
+  }
+
+  createCard() {
+    this.navCtrl.push(AdminCardDetailsPage)
+  }
+
+  deleteClassList() {
+    let confirm = this.alertController.create({
+      title: 'remove all?',
+      message: 'Are you sure you want to remove all cards from the list?',
+      buttons: [
+        {
+          text: 'Yes',
+          handler: () => {
+            this.dataService.deleteAllCards().then(() => {
+              this.toastController.create({
+                message: 'You have delted the entire list',
+                duration: 2000,
+                position: 'bottom'
+              }).present()
+            }).catch(() => {
+              this.toastController.create({
+                message: 'operation faild',
+                duration: 2000,
+                position: 'bottom'
+              }).present()
+            })
+          }
+        },
+        { text: 'No' }
+      ]
+    });
+    confirm.present();
+  }
 
 }

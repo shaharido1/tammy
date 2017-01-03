@@ -1,41 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
-import {DataService} from './../../../../shared/providers/providers'
-import {userDetailPage} from './../../../pages'
-import {IUser} from './../../.../../../../shared/interfaces'
+import { DataService } from './../../../../shared/providers/providers'
+import { AdminUserDetailsPage } from './../../../pages'
+import { IUser } from './../../.../../../../shared/interfaces'
 import * as _ from 'lodash'
 
 @Component({
   selector: 'page-user-list',
-  templateUrl: 'users-list.html'
+  templateUrl: 'admin-users-list.html'
 })
-export class UsersListPage implements OnInit {
+export class AdminUsersListPage implements OnInit {
   allUsers: Array<any>
   categorizedUsers: Array<any>
   displayUsers: Array<IUser>
   queryText: string = ""
 
-  
-  constructor(public navCtrl: NavController, 
-              public dataService : DataService,
-              private loadingController: LoadingController,
-              private toastController: ToastController,
-              private alertController: AlertController) {}
 
-  ngOnInit(){
-    let loader = this.loadingController.create({
-      content: "loading users list"
-    })
-    loader.present(
-      this.dataService.getAllUsers()
-        .subscribe((res) => {
-          this.allUsers=res
-          this.sortUsers()
-        },
-        (err) => {
-          console.log(err)
-        }))
-    loader.dismiss()
+  constructor(public navCtrl: NavController,
+    public dataService: DataService,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private alertController: AlertController) { }
+
+  ngOnInit() {
+    this.dataService.getAllUsers()
+      .subscribe((res) => {
+        this.allUsers = res
+        this.sortUsers()
+      })
   }
 
   sortUsers() {
@@ -57,9 +49,9 @@ export class UsersListPage implements OnInit {
         .value();
     this.displayUsers = this.categorizedUsers
   }
-  
+
   goToUserDetails($event, user) {
-    this.navCtrl.push(userDetailPage, user)
+    this.navCtrl.push(AdminUserDetailsPage, user)
   }
 
 

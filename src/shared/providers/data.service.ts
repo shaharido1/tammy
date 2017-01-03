@@ -1,10 +1,11 @@
+import { Events } from 'ionic-angular';
 import { Injectable } from '@angular/core';
-import { AngularFire, FirebaseListObservable, FirebaseRef } from 'angularfire2'
+import { AngularFire, FirebaseListObservable, FirebaseRef, FirebaseAuthState } from 'angularfire2'
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/find';
-import 'rxjs/add/operator/isEmpty';
+import 'rxjs/add/operator/filter';
 import { Observable } from 'rxjs/Observable';
-import { Paths, IUser, IRefCard, IRefUser, ICard, ISchool } from './../interfaces';
+import { Paths, IUser, IRefCard, IRefUser, ICard, ISchool, IComment, ICommantRef, EventsTypes } from './../interfaces';
 import { MappingService } from './mapping.service'
 import * as _ from 'lodash'
 @Injectable()
@@ -12,43 +13,44 @@ export class DataService {
     connectionRef: any
     schools: FirebaseListObservable<any>
     categories: FirebaseListObservable<any>
-    cards : FirebaseListObservable<any> //maybe can be removed in full version
+    cards: FirebaseListObservable<any> //maybe can be removed in full version
     root: any
     usersRef: any
+    user: IUser
     public connected: boolean = false;
 
-    constructor(private angularFire: AngularFire) {
+    constructor(private angularFire: AngularFire, public events: Events) {
         console.log("entered data service")
         this.root = this.angularFire.database.object(Paths.root)
         this.connectionRef = this.angularFire.database.object(Paths.infoConnected)
         this.categories = this.angularFire.database.list(Paths.categories)
         this.cards = this.angularFire.database.list(Paths.cards)
-        try {
-            this.checkFirebaseConnection();
-        } catch (error) {
-            console.log('Firebase: No connection:' + error);
-        }
+        events.subscribe(EventsTypes.userConnected, (user) => {
+            this.user = user
+        })
+        this.checkFirebaseConnection();
     }
 
     checkFirebaseConnection() {
-        try {
-            this.connectionRef.on('value', function (snap) {
-                console.log(snap.val());
-                if (snap.val() === true) {
-                    console.log('Firebase: Connected:');
-                    this.connected = true;
-                } else {
-                    console.log('Firebase: No connection:');
-                    this.connected = false;
-                }
-            });
-        }
-        catch (error) {
-            console.log('Firebase: No connection:' + error);
-            this.connected = false;
-        }
+        this.angularFire.database.object(Paths.infoConnected, { preserveSnapshot: true })
+            .subscribe((snap) => {
+                (snap.val() === true) ? this.events.publish(EventsTypes.firebaseConnected)
+                    : this.events.publish(EventsTypes.firebaseDisconnected)
+            }, (err) => {
+                this.events.publish(EventsTypes.firebaseDisconnected)
+                console.log("firebase disconnected" + err)
+            })
     }
+
     ///////////////////////////////////////users////////////////////////////////////
+
+
+
+    getUserByKey(key: string): Observable<IUser> {
+        return this.angularFire.database.object(`${Paths.users}/${key}`).map(user =>
+        { return MappingService.mapUserfromDbToApp(user) })
+    }
+
     getAllUsers(): Observable<any> {
         return this.angularFire.database.list(Paths.users)
             .map((res) => {
@@ -58,9 +60,10 @@ export class DataService {
             })
     }
 
+
     //sign up/add new user -> from the auth service//
 
-    updateUser(user: IUser, oldCardAllocation?: Array<IRefCard>): firebase.Promise<any> {
+    updateUser(user: IUser, oldCardAllocation?: Array<IRefCard>): Promise<any> {
         let upref = {}
         let userToSet = MappingService.mapUserfromAppToDb(user)
         upref[`${Paths.users}/${user.key}`] = userToSet
@@ -89,15 +92,15 @@ export class DataService {
     //set() -> destructive update, oppose to update()
 
 
-    deleteAllUsers(): firebase.Promise<any> {
+    deleteAllUsers(): Promise<any> {
         let upRef = {}
-        let finish : boolean = false
+        let finish: boolean = false
         upRef[`${Paths.users}`] = null
-        this.cards.subscribe( (res) => {
-            res.map( (card) =>
-            upRef[`${Paths.cards}/${card.key}/${Paths.allocatedUsers}`] = null
-             )
-        }, (err)=> console.log(err), () => finish =true )
+        this.cards.subscribe((res) => {
+            res.map((card) =>
+                upRef[`${Paths.cards}/${card.key}/${Paths.allocatedUsers}`] = null
+            )
+        }, (err) => console.log(err), () => finish = true)
 
         if (finish) return (this.root.update(upRef))
     }
@@ -106,16 +109,31 @@ export class DataService {
     getAllCards(): Observable<any> {
         return this.angularFire.database.list(Paths.cards)
             .map((res) => {
+                console.log("res" + res)
                 return res.map(card => {
-                return MappingService.mapCardfromDbToApp(card)
+                    console.log("card" + card.$key)
+                    return MappingService.mapCardfromDbToApp(card)
                 })
             })
     }
-    getCardsOfUser(userID: any) {
+
+    getListOfCards(alloctedCardsOrFavorite: boolean): Observable<ICard> {
+        let listCards: Array<IRefCard> = alloctedCardsOrFavorite ? this.user.allocatedCards : this.user.favoriteCards
+        return new Observable(observer => {
+            listCards.map((lisCard) => {
+                this.angularFire.database.object(`${Paths.cards}/${lisCard.key}`)
+                    .subscribe((card) => {
+                        observer.next(MappingService.mapCardfromDbToApp(card))
+                    }, err => observer.error(err))
+            })
+        })
+    }
+
+    getCardsOfUser(userID: any) : FirebaseListObservable<ICard[]> {
         return this.angularFire.database.list(Paths.cards)
     }
 
-    deleteAllCards() {
+    deleteAllCards() : firebase.Promise<any> {
         return this.angularFire.database.list(Paths.cards).remove()
     }
 
@@ -143,23 +161,24 @@ export class DataService {
     }
 
     saveNewCard(cardToSave: ICard): firebase.Promise<void> {
-        cardToSave.key=null
+        cardToSave.key = null
         return this.angularFire.database.list(`${Paths.cards}`).push(cardToSave)
     }
 
     ///////////////////////////schools//////////////////////////////////////////////////////////
-    getAllSchools(): Observable<any> {
+    getAllSchools(): Observable<ISchool[]> {
         return this.angularFire.database.list(Paths.schools)
             .map((res) => {
                 return res.map(school => {
-                return MappingService.mapSchoolfromDbToApp(school)
+                    return MappingService.mapSchoolfromDbToApp(school)
                 })
             })
     }
 
-    updateSchool(schoolToUpdate) : firebase.Promise<void> {
+    updateSchool(schoolToUpdate): firebase.Promise<void> {
         return this.angularFire.database.object(`${Paths.schools}/${schoolToUpdate.key}`)
-              .set({name: schoolToUpdate.name})
+            .set({ name: schoolToUpdate.name })
+            ///to update everywhere in database................
     }
 
     saveNewSchool(schoolToSave: ISchool): firebase.Promise<any> {
@@ -172,16 +191,38 @@ export class DataService {
 
     ///////////////////////////categories//////////////////////////////////////////////////////////
 
-    getAllCategories() {
+    getAllCategories() : FirebaseListObservable<any> {
         return this.categories
-
-
+    }
+    ///////////////////////////////////commants////////////////////////////////////////////////////
+    setNewCommant(commant: IComment): Promise<any> {
+        debugger
+        return new Promise((resolve, reject) => {
+            debugger
+            this.angularFire.database.list(Paths.commants).push(commant).then(
+                (data) => {
+                    debugger
+                    let commantkey: string = data.path.o[1]
+                    let upref = {}
+                    upref[`${Paths.cards}/${commant.cardDetails.key}/${Paths.commants}/${commantkey}`] = { title: commant.title }
+                    upref[`${Paths.users}/${commant.userDetails.key}/${Paths.commants}/${commantkey}`] = { title: commant.title }
+                    this.root.update(upref).then((res) => resolve()).catch((err)=>reject(err))
+                }).catch((err) => reject(err))
+        })
     }
 
+    getCommantsByList(cardCommants: Array<ICommantRef>): Observable<IComment> {
+        return new Observable(observer => {
+            cardCommants.map((commant) => {
+                this.angularFire.database.object(`${Paths.commants}/${commant.key}`)
+                    .subscribe(responseCommant => {
+                        observer.next(responseCommant)
+                    }, err => observer.error(err)
+                    )
+            })
+        })
+    }
 }
-
-
-
 
     // private checkIfExists(key: string): Promise<any> {
     //     let prom = new Promise((reject, resolve) => {

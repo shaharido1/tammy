@@ -2,15 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular';
 import { ICard, IUser, IRefUser, categories } from './../../../../shared/interfaces'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { AdminCardsPage } from './../../../pages'
+import { AdminCardsListPage } from './../../../pages'
 import { DataService } from './../../../../shared/providers/providers'
 import * as _ from 'lodash'
 
 @Component({
   selector: 'page-create-or-update-card',
-  templateUrl: 'create-or-update-card.html'
+  templateUrl: 'admin-card-details.html'
 })
-export class CreateOrUpdateCardPage implements OnInit {
+export class AdminCardDetailsPage implements OnInit {
   oldUserAllocation: Array<IRefUser> = []
   updateOrSave: Boolean = true;
   queryText: string = ""
@@ -41,17 +41,19 @@ export class CreateOrUpdateCardPage implements OnInit {
       content: "loading cards list"
     })
 
-    loader.present()
-    if (this.navParams.data.name) {
-      this.card = this.navParams.data
-          Object.assign(this.oldUserAllocation, this.card.allocatedUsers)
-    }
-    else {this.updateOrSave = false}
-    this.getDataFromServer()
-    loader.dismiss()
+    loader.present().then(() => {
+      if (this.navParams.data.name) {
+        this.card = this.navParams.data
+        Object.assign(this.oldUserAllocation, this.card.allocatedUsers)
+      }
+      else { this.updateOrSave = false }
+      this.getDataFromServer()
+      loader.dismiss().catch((err) => console.log(err))
 
-    
-    
+    })
+
+
+
     this.cardForm = this.formBuilder.group({
       'name': ['', Validators.compose([Validators.required])],
       'category': ['', Validators.compose([Validators.required])]
@@ -81,16 +83,16 @@ export class CreateOrUpdateCardPage implements OnInit {
   }
   mapUsersForTuggole() {
     if (this.card.allocatedUsers) {
-    this.allUsers.map(user => {
-      debugger
-      user.checked = false;
-      for (let i = 0; i < this.card.allocatedUsers.length; i++) {
-        if (this.card.allocatedUsers[i].key == user.key) {
-          user.checked = true;
-          break
+      this.allUsers.map(user => {
+        debugger
+        user.checked = false;
+        for (let i = 0; i < this.card.allocatedUsers.length; i++) {
+          if (this.card.allocatedUsers[i].key == user.key) {
+            user.checked = true;
+            break
+          }
         }
-      }
-    })
+      })
     }
   }
 
@@ -113,10 +115,14 @@ export class CreateOrUpdateCardPage implements OnInit {
         .value();
     this.displayUsers = this.categorizedUsers
   }
-  
+  cancel() {
+    console.log("cancel")
+    this.navCtrl.push(AdminCardsListPage)
+  }
+
   pushUserToCard(event, user) {
     //have to init the array on the funciton
-    if (!this.card.allocatedUsers) {this.card.allocatedUsers=[]}
+    if (!this.card.allocatedUsers) { this.card.allocatedUsers = [] }
     event ? this.card.allocatedUsers.push({ key: user.key, fullName: user.fullName })
       : this.card.allocatedUsers = this.card.allocatedUsers
         .filter(cardUser => cardUser.key !== user.key)
@@ -143,7 +149,7 @@ export class CreateOrUpdateCardPage implements OnInit {
       position: 'bottom'
     })
     toastSuccess.present()
-    this.navCtrl.setRoot(AdminCardsPage)
+    this.navCtrl.setRoot(AdminCardsListPage)
   }
 
   private onFail(err) {

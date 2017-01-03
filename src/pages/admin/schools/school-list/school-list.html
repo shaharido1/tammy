@@ -30,5 +30,6 @@
     <button *ngFor="let scl of filterSchoolList" ion-item (click)="editClass($event, scl)">{{scl.name}}
       </button>
   </ion-list>
-
+    <button *ngFor="let scl of observ | async" ion-item (click)="editClass($event, scl)">{{scl.name}}
+      </button>
 </ion-content>

@@ -20,7 +20,7 @@
   <ion-list>
     <ion-item-group *ngFor="let category of displayCards ">
       <ion-item-divider color="secondary">{{category.categoryName}}</ion-item-divider>
-      <button ion-item *ngFor="let card of category.categoryCards" (click)="editCard($event, card)">
+      <button ion-item *ngFor="let card of category.categoryCards" (click)="pushToCardDetails($event, card)">
                 {{card.name}}
             </button>
     </ion-item-group>

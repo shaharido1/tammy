@@ -53,12 +53,16 @@ export class SignUpPage implements OnInit {
   }
 
   onSignUpSubmit(filledAccountForm : IUser) {
-    //let loader = this.loadingController.create({ content: "regestiring" })
+    //let loader = this.loadingController.create({ content: "regestiring" , dismissOnPageChange: true})
+    
     ///////////some wired bug with the loader.. can't pass any parmas to on success/////////
+    //loader.present().then( ()=> {
     this.authService.createUser(filledAccountForm)
       .then(() => this.navCtrl.setRoot(MyApp))
       .catch((err) => this.onFail(err))
-  }
+    //})
+    //loader.dismiss()
+}
 
   onSuccess() {
     console.log("user saved in DB")

@@ -41,7 +41,10 @@ export class LoginPage implements OnInit {
       email: logInfilledForm.email,
       password: logInfilledForm.password
     })
-      .then((auth) =>  this.navCtrl.setRoot(TabsPage)) 
+      .then((auth) =>  
+        {this.authService.getCurrentUser()
+        this.navCtrl.setRoot(TabsPage)
+      }) 
         //(authdata) => {
       //this.onSuccess(authdata)
       //loader.dismiss()

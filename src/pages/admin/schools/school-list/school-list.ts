@@ -1,48 +1,46 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
-import {DataService} from './../../../../shared/providers/providers'
-import {SchoolDetailPage} from './../../../pages'
-import {ISchool} from './../../../../shared/interfaces'
+import { DataService } from './../../../../shared/providers/providers'
+import { SchoolDetailPage } from './../../../pages'
+import { ISchool } from './../../../../shared/interfaces'
+import { Observable } from 'rxjs/Observable';
+
 @Component({
   selector: 'page-school-list',
   templateUrl: 'school-list.html'
 })
 export class SchoolListPage implements OnInit {
-  schoolList : Array<ISchool>;
+  schoolList: Array<ISchool>;
   filterSchoolList: Array<ISchool>
   queryText: string = ""
-  constructor(public navCtrl: NavController, 
-              public dataService : DataService,
-              private loadingController: LoadingController,
-              private toastController: ToastController,
-              private alertController: AlertController) {}
+  observ : any
+  constructor(public navCtrl: NavController,
+    public dataService: DataService,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private alertController: AlertController) { }
 
-  ngOnInit(){
-    let loader = this.loadingController.create({
-      content: "loading schools list"
-    })
-    loader.present(
-      this.dataService.getAllSchools()
-        .subscribe((res) => {
-          console.log(res)
-          debugger
-          this.schoolList = res
-          this.filterSchoolList = this.schoolList
-        },
-        (err) => {
-          console.log(err)
-        }))
-    loader.dismiss()
+  ngOnInit() {
+    this.observ=this.dataService.getAllSchools
+    this.dataService.getAllSchools()
+      .subscribe((res) => {
+        console.log(res)
+        debugger
+        this.schoolList = res
+        this.filterSchoolList = this.schoolList
+      }, (err) => {
+        console.log(err)
+      })
   }
 
   searchList() {
-     debugger
-     this.filterSchoolList = this.schoolList.filter((scl) => {
-       if (!this.queryText || scl.key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
-              return scl
-      })
+    debugger
+    this.filterSchoolList = this.schoolList.filter((scl) => {
+      if (!this.queryText || scl.key.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
+        return scl
+    })
   }
-  
+
   editClass($event, scl) {
     this.navCtrl.push(SchoolDetailPage, scl)
   }

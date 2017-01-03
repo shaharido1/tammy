@@ -1,6 +1,15 @@
 {
   "name": "myApp",
-  "app_id": "",
+  "app_id": "90ad4316",
   "v2": true,
-  "typescript": true
+  "typescript": true,
+  "watch": {
+    "sass": ["scss/**/*.scss"],
+    "html": ["src/**/*.html"],
+    "livereload": [
+      "src/**/*.html",
+      "src/**/*.ts",
+      "src/**/*.css"
+    ]
+  }
 }

@@ -9,13 +9,19 @@ export class IUser {
     phone: string;
     allocatedCards?: Array<IRefCard> 
     counterComments?: Number
-    commants?: Array<IComments>
+    commants?: Array<ICommantRef>
     fullName: string;
+    favoriteCards? : Array<IRefCard>
 }
 
 export interface ISchool {
     key: string
     name : string
+}
+
+export interface ICommantRef {
+    key: string
+    title : string
 }
 
 export interface IRefCard {
@@ -29,12 +35,13 @@ export interface IRefUser {
 
 }
 
-export interface IComments {
+export interface IComment {
     key?: string
     userDetails?: IRefUser
     cardDetails?: IRefCard
-    name: string
+    title: string
     contnet: string
+    date : string;
 }
 
 export interface ICard {
@@ -43,7 +50,7 @@ export interface ICard {
     category: categories;
     urlToFile: string
     allocatedUsers: Array<IRefUser>
-    commants: Array<IComments>
+    commants: Array<ICommantRef>
 }
 
 export interface categories {
@@ -58,13 +65,21 @@ export class ErrorMesseges {
 }
 
 import {databaseRootUrl} from './../app/firebase.config'
-export class Paths {
-    public static root: string = databaseRootUrl
-    public static users: string = "users"
-    public static cards: string = "cards"
-    public static schools: string = "schools"
-    public static categories: string ="categories"
-    public static infoConnected: string = ".info/connected"
-    public static allocatedUsers: string ="allocatedUsers"
-    public static allocatedCards: string = "allocatedCards"
+export const Paths = {
+    root: databaseRootUrl,
+    users: "users",
+    cards: "cards",
+    schools: "schools",
+    categories:"categories",
+    infoConnected: ".info/connected",
+    allocatedUsers:"allocatedUsers",
+    allocatedCards: "allocatedCards",
+    commants: "commants",
+    
+}
+
+export const EventsTypes = {
+    firebaseConnected : "firebaseConnected",
+    firebaseDisconnected : "firebaseDisconnected",
+    userConnected : "userConnected"
 }

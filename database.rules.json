@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": "true",
+    ".write": "true",
+    "users": {
+      ".read" : "true",
+      ".write": "true",
+    },
+      "schools": {
+      	".read": "true",
+          "$schools_id": {
+            ".write": true,
+            ".validate": "!data.exists()"
+          }
+    }
+  	}
+}
