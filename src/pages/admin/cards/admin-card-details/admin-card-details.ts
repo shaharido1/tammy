@@ -1,29 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular';
-import { ICard, IUser, IRefUser, categories } from './../../../../shared/interfaces'
+import { ICard, IUser, IRefUser } from './../../../../shared/interfaces'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { AdminCardsListPage } from './../../../pages'
 import { DataService } from './../../../../shared/providers/providers'
 import * as _ from 'lodash'
+import {Subscription} from 'rxjs/Subscription.d'
 
 @Component({
   selector: 'page-create-or-update-card',
   templateUrl: 'admin-card-details.html'
 })
-export class AdminCardDetailsPage implements OnInit {
+export class AdminCardDetailsPage implements OnInit, OnDestroy {
+  subscription : Subscription
   oldUserAllocation: Array<IRefUser> = []
   updateOrSave: Boolean = true;
   queryText: string = ""
   allUsers: Array<any>
   categorizedUsers: Array<any>
   displayUsers: Array<IUser>
-  categories: Array<boolean>
+  categories: Array<{name : string}>
   cardForm: FormGroup;
   name: AbstractControl
   category: AbstractControl
-  card: ICard = {
+  card: ICard = { 
     allocatedUsers: [],
-    category: { key: "", name: "" },
+    category: " ",
     commants: [],
     urlToFile: "",
     name: "",
@@ -34,26 +36,16 @@ export class AdminCardDetailsPage implements OnInit {
     private toastController: ToastController,
     private formBuilder: FormBuilder,
     public dataService: DataService,
-    private loadingController: LoadingController) { }
+    private loadingController: LoadingController) {
 
-  ngOnInit() {
-    let loader = this.loadingController.create({
-      content: "loading cards list"
-    })
+    //set card info
+    if (this.navParams.data.name) {
+      this.card = this.navParams.data
+      Object.assign(this.oldUserAllocation, this.card.allocatedUsers)
+    }
+    else { this.updateOrSave = false }
 
-    loader.present().then(() => {
-      if (this.navParams.data.name) {
-        this.card = this.navParams.data
-        Object.assign(this.oldUserAllocation, this.card.allocatedUsers)
-      }
-      else { this.updateOrSave = false }
-      this.getDataFromServer()
-      loader.dismiss().catch((err) => console.log(err))
-
-    })
-
-
-
+    //set form info
     this.cardForm = this.formBuilder.group({
       'name': ['', Validators.compose([Validators.required])],
       'category': ['', Validators.compose([Validators.required])]
@@ -63,24 +55,42 @@ export class AdminCardDetailsPage implements OnInit {
       this.cardForm.patchValue({ [field]: this.card[field] })
       this[field] = this.cardForm.controls[field]
     }
+
   }
 
-  getDataFromServer() {
-    this.dataService.getAllCategories().subscribe(res => {
-      console.log(res)
-      this.categories = res
+  
+  ngOnInit() {
+    let loader = this.loadingController.create({
+      content: "loading cards list",
     })
-    this.dataService.getAllUsers()
-      .subscribe((res) => {
-        console.log(res)
-        this.allUsers = res
-        this.mapUsersForTuggole()
-        this.sortUsers()
-      },
-      (err) => {
-        console.log(err)
-      })
+    loader.present().then(() => {
+      //get date from server
+      this.categories = this.dataService.getCategories()
+      this.subscription=this.dataService.getAllUsers()
+        .subscribe((res) => {
+          console.log("users" + res)
+          debugger
+          this.allUsers = res
+          this.mapUsersForTuggole()
+          this.sortUsers()
+          loader.dismiss().catch(() => console.log("error in dismissing"))
+        },
+        (err) => {
+          console.log(err)
+          loader.dismiss().catch(() => console.log("error in dismissing"))
+        })
+    })
   }
+
+  refreshAll(refresher) { 
+    refresher.complete()
+    this.ngOnInit() 
+  } 
+  ngOnDestroy(){
+    console.log("unsubscribe from all users list")
+  this.subscription.unsubscribe()
+  }
+
   mapUsersForTuggole() {
     if (this.card.allocatedUsers) {
       this.allUsers.map(user => {
@@ -114,6 +124,7 @@ export class AdminCardDetailsPage implements OnInit {
         .value();
     this.displayUsers = this.categorizedUsers
   }
+
   cancel() {
     console.log("cancel")
     this.navCtrl.push(AdminCardsListPage)
@@ -131,7 +142,7 @@ export class AdminCardDetailsPage implements OnInit {
     for (let field in filledcardForm) {
       this.card[field] = filledcardForm[field]
     }
-    console.log(this.card)
+    console.log("updating" + this.card.key)
     this.updateOrSave ?
       this.dataService.updateCard(this.card, this.oldUserAllocation)
         .then((res) => this.onSuccess(res))

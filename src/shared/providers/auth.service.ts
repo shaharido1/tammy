@@ -3,17 +3,17 @@ import { FirebaseAuthState, AngularFire, AngularFireAuth } from 'angularfire2';
 import { EmailPasswordCredentials } from './../../../node_modules/angularfire2/auth/auth_backend.d'
 import { IUser, Paths, EventsTypes } from './../interfaces'
 import { MappingService } from './mapping.service'
-import {Events } from 'ionic-angular';
+import { Events } from 'ionic-angular';
 
 @Injectable()
 export class AuthService {
-  auth: FirebaseAuthState
+  auth: AngularFireAuth
   user: IUser
-  constructor(public angularFire: AngularFire, public events : Events) {
+  constructor(public angularFire: AngularFire, public events: Events) {
     this.getCurrentUser()
   }
   ///inject firebase - for delete, change password, etc. 
-  createUser(user): Promise<FirebaseAuthState> {
+  createUser(user): Promise<AngularFireAuth> {
     return new Promise((resolve, reject) => {
       this.angularFire.auth.createUser({ email: user.email, password: user.password })
         .then((auth) => {
@@ -48,8 +48,9 @@ export class AuthService {
     return this.angularFire.auth.login(cradentials)
   }
 
-  logOutUser(): void {
-    this.angularFire.auth.logout();
+  logOutUser(): firebase.Promise<any> {
+    this.user = null;
+    return this.angularFire.auth.logout();
   }
 
   getCurrentUser(): Promise<IUser> {
@@ -58,26 +59,55 @@ export class AuthService {
         resolve(this.user)
       }
       else {
-        this.angularFire.auth.subscribe((auth) => {
+        this.getAuthUser().subscribe((auth) => {
           if (auth) {
-            this.angularFire.database.object(`${Paths.users}/${auth.uid}`)
-              .subscribe((user) => {
-                this.user = MappingService.mapUserfromDbToApp(user)
-                this.events.publish(EventsTypes.userConnected, this.user)
-                resolve(this.user)
-              }, err => {
-                console.log(err + "error in database")
-                reject(err)
-              })
+            this.getUserData(auth)
+            .then((user) => {resolve(user)})
+            .catch((err) => reject(err))
           }
-        }, err => {
-          console.log(err + "error in auth")
-          reject(err)
-        })
+          else {resolve()}
+        }, err=> reject("can't auth"))
       }
     })
   }
 
+  private getAuthUser(): AngularFireAuth {
+    return this.angularFire.auth
+  }
+
+  getUserData(auth: FirebaseAuthState): Promise<IUser> {
+    return new Promise((resolve, reject) => {
+      this.angularFire.database.object(`${Paths.users}/${auth.uid}`)
+        .subscribe((user) => {
+          this.user = MappingService.mapUserfromDbToApp(user)
+          this.events.publish(EventsTypes.userConnected, this.user)
+          resolve(this.user)
+        }, err => {
+          console.log(err + "error in database")
+          reject(err)
+        })
+    })
+  }
+
+  ////////////////////admin////////////////////////////
+  makeUserAdmin(user: IUser): firebase.Promise<void> {
+    return this.angularFire.database.object(`${Paths.admins}/${user.key}`).update({ fullName: user.fullName })
+  }
+  removeAdmin(user: IUser): firebase.Promise<void> {
+    return this.angularFire.database.object(`${Paths.admins}/${user.key}`).remove()
+  }
+
+  isAdmin(user: IUser): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.angularFire.database.object(`${Paths.admins}/${user.key}`).subscribe((res) => {
+        if (res.fullName) { resolve(true) }
+        else { resolve(false) }
+      }, err => {
+        console.log(err)
+        reject(err)
+      })
+    })
+  }
 
 
 }

@@ -1,18 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { DataService } from './../../../../shared/providers/data.service'
 import { AdminCardDetailsPage } from './../../../pages'
-import {ICard} from './../../../../shared/interfaces'
+import { ICard } from './../../../../shared/interfaces'
 import * as _ from 'lodash'
+import { Subscription } from 'rxjs/Subscription.d'
+
 @Component({
   selector: 'admin-cards',
   templateUrl: 'admin-cards-list.html'
 })
-export class AdminCardsListPage implements OnInit {
-  allCards : Array<ICard>
-  categorizedCards : Array<any>
-  displayCards : Array<ICard> 
+export class AdminCardsListPage implements OnInit, OnDestroy {
+  allCards: Array<ICard>
+  categorizedCards: Array<any>
+  displayCards: Array<ICard>
   queryText: string = ""
+  subscription: Subscription
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -22,32 +25,36 @@ export class AdminCardsListPage implements OnInit {
     private toastController: ToastController) { }
 
   ngOnInit() {
-    let loader = this.loadingController.create({content: "loading cards list"})
-    loader.present().then( () => {
-      this.dataService.getAllCards()
-        .subscribe((res) => {
-          this.allCards = res
+    let loader = this.loadingController.create({
+      content: "loading cards list"
+    })
+    loader.present().then(() => {
+      this.subscription = this.dataService.getAllCards()
+        .subscribe((cards: ICard[]) => {
+          this.allCards = cards
           this.sortCards()
-              loader.dismiss()    
+          loader.dismiss().catch(()=>console.log("error in dismissing"))
 
           //  this.filterCardsList = this.allCardsList
         },
         (err) => {
           console.log(err)
-              loader.dismiss()    
-
+          loader.dismiss().catch(()=>console.log("error in dismissing"))
         })
-    })
+    }).catch(()=> console.log("error in presenting"))
   }
 
-
+  ngOnDestroy() {
+    console.log("unsubscribe from all users list")
+    this.subscription.unsubscribe()
+  }
   sortCards() {
     this.categorizedCards =
       _.chain(this.allCards)
         //for each team in array
         .filter(card => {
           if (!this.queryText || card.name.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
-              return card
+            return card
         })
         //groupby (array, function/string) -> if string, looking for the same value 
         .groupBy('category')
@@ -65,7 +72,10 @@ export class AdminCardsListPage implements OnInit {
     console.log(card)
     this.navCtrl.push(AdminCardDetailsPage, card)
   }
-
+  refreshAll(refresher) {
+    refresher.complete()
+    this.ngOnInit()
+  }
   createCard() {
     this.navCtrl.push(AdminCardDetailsPage)
   }

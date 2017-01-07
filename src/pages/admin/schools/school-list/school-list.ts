@@ -15,7 +15,7 @@ export class SchoolListPage implements OnInit, OnDestroy {
   schoolList: Array<ISchool>;
   filterSchoolList: Array<ISchool>
   queryText: string = ""
-  schoolSub : Subscription
+  subscription : Subscription
   constructor(public navCtrl: NavController,
     public dataService: DataService,
     private loadingController: LoadingController,
@@ -23,7 +23,7 @@ export class SchoolListPage implements OnInit, OnDestroy {
     private alertController: AlertController) { }
 
   ngOnInit() {
-    this.schoolSub= this.dataService.getAllSchools()
+    this.subscription= this.dataService.getAllSchools()
       .subscribe((res) => {
         console.log(res)
         this.schoolList = res
@@ -34,7 +34,7 @@ export class SchoolListPage implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     console.log("unsubscribed from school list")
-    this.schoolSub.unsubscribe()
+    this.subscription.unsubscribe()
   }
 
   searchList() {
@@ -51,8 +51,8 @@ export class SchoolListPage implements OnInit, OnDestroy {
     this.navCtrl.push(SchoolDetailPage)
   }
   refreshAll(refresher) {
+    refresher.complete()
     this.ngOnInit()
-    refresher.complete();
   }
 
   deleteClassList() {

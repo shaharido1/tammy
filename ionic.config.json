@@ -4,8 +4,12 @@
   "v2": true,
   "typescript": true,
   "watch": {
-    "sass": ["scss/**/*.scss"],
-    "html": ["src/**/*.html"],
+    "sass": [
+      "scss/**/*.scss"
+    ],
+    "html": [
+      "src/**/*.html"
+    ],
     "livereload": [
       "src/**/*.html",
       "src/**/*.ts",

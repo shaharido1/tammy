@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import { DataService } from './../../../../shared/providers/providers'
 import { AdminUserDetailsPage } from './../../../pages'
 import { IUser } from './../../.../../../../shared/interfaces'
 import * as _ from 'lodash'
+import { Subscription } from 'rxjs/Subscription'
 
 @Component({
   selector: 'page-user-list',
   templateUrl: 'admin-users-list.html'
 })
-export class AdminUsersListPage implements OnInit {
+export class AdminUsersListPage implements OnInit, OnDestroy {
   allUsers: Array<any>
   categorizedUsers: Array<any>
   displayUsers: Array<IUser>
   queryText: string = ""
+  subscription: Subscription
 
 
   constructor(public navCtrl: NavController,
@@ -23,11 +25,22 @@ export class AdminUsersListPage implements OnInit {
     private alertController: AlertController) { }
 
   ngOnInit() {
-    this.dataService.getAllUsers()
-      .subscribe((res) => {
-        this.allUsers = res
-        this.sortUsers()
-      })
+    let loader = this.loadingController.create({
+      content: "loading cards list",
+    })
+    loader.present().then(() => {
+      this.subscription = this.dataService.getAllUsers()
+        .subscribe((res) => {
+          this.allUsers = res
+          this.sortUsers()
+          loader.dismiss().catch(() => console.log("error in dismissing"))
+        })
+    })
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe()
+    console.log("unsubscribed from getAllCards")
   }
 
   sortUsers() {
@@ -56,8 +69,8 @@ export class AdminUsersListPage implements OnInit {
 
 
   refreshAll(refresher) {
+    refresher.complete()
     this.ngOnInit()
-    refresher.complete();
   }
 
   deleteUserList() {

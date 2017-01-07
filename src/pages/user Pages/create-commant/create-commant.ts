@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, ToastController, NavParams, LoadingController } from 'ionic-angular';
+import { Events, NavController, ToastController, NavParams, LoadingController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { DataService, AuthService } from './../../../shared/providers/providers'
-import { ICard, IUser, IComment } from './../../../shared/interfaces'
-
+import { ICard, IUser, IComment, EventsTypes } from './../../../shared/interfaces'
+import { CardDetailsPage } from './../../pages'
 @Component({
   selector: 'page-create-commant',
   templateUrl: 'create-commant.html'
@@ -22,7 +22,8 @@ export class CreateCommantPage {
     public loadingCtrl: LoadingController,
     public authService: AuthService,
     public dataService: DataService,
-    public toastController: ToastController) {
+    public toastController: ToastController,
+    public events: Events) {
 
   }
   ngOnInit() {
@@ -57,13 +58,17 @@ export class CreateCommantPage {
           title: commentForm.title,
           contnet: commentForm.content,
           userDetails: { key: this.user.key, fullName: this.user.fullName },
-          cardDetails: { key: this.card.key, name: this.card.name },
+          cardDetails: { key: this.card.key, name: this.card.name, category: this.card.category },
+          img: this.user.img ? this.user.img : null,
           date: new Date().toString()
         };
         this.dataService.setNewCommant(newComment)
           .then(() => {
             loader.dismiss()
-              .then(() => this.nav.pop())
+              .then(() => {
+                this.events.publish(EventsTypes.cardUpdated)
+                this.nav.pop()
+              })
               .catch((err) => console.log(err))
           })
           .catch((err) => {

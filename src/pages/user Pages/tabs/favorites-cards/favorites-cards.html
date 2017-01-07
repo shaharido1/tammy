@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-     <button ion-button menuToggle>
+    <button ion-button menuToggle>
         <ion-icon name='menu'></ion-icon>
      </button>
     <ion-title>cards</ion-title>
@@ -11,13 +11,17 @@
 
 
 <ion-content padding>
-    <ion-list>
-      <ion-list-header>
-        favorite cards
-      </ion-list-header>
-      <ion-item *ngFor="let card of favoriteCards">
-        {{card.name}}
-      </ion-item>
-    </ion-list>
+  <ion-refresher (ionRefresh)="refreshAll($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list *ngIf="isUser==true">
+    <ion-list-header>
+      favorite cards
+    </ion-list-header>
+    <ion-item *ngFor="let card of user.favoriteCards">
+      {{card.name}}
+    </ion-item>
+  </ion-list>
+  <ion-item *ngIf="isUser==false">no favorite cards picked</ion-item>
 
 </ion-content>

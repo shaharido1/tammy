@@ -8,7 +8,7 @@
   </ion-navbar>
 
   <ion-toolbar>
-    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="searchList()">
+    <ion-searchbar placeholder="Search" [(ngModel)]="queryText" (ionInput)="sortCards()">
     </ion-searchbar>
     <ion-row>
     </ion-row>
@@ -17,6 +17,9 @@
 </ion-header>
 
 <ion-content padding>
+  <ion-refresher (ionRefresh)="refreshAll($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list>
     <ion-item-group *ngFor="let category of displayCards ">
       <ion-item-divider color="secondary">{{category.categoryName}}</ion-item-divider>

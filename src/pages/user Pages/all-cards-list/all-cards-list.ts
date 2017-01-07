@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
-import { DataService } from './../../../shared/providers/data.service'
-import { ICard } from './../../../shared/interfaces'
+import { NavController, NavParams, LoadingController, AlertController, ToastController, Loading } from 'ionic-angular';
+import { DataService, AuthService } from './../../../shared/providers/providers'
+import { ICard, IUser, IRefCard } from './../../../shared/interfaces'
 import * as _ from 'lodash'
 import { CardDetailsPage } from './../../pages'
-import {Subscription} from 'rxjs/Subscription.d'
+import { Subscription } from 'rxjs/Subscription.d'
 
 @Component({
   selector: 'page-all-user-cards',
@@ -12,37 +12,51 @@ import {Subscription} from 'rxjs/Subscription.d'
 })
 
 export class AllcardsListPage implements OnInit, OnDestroy {
-  allCards: Array<ICard> = []
   categorizedCards: Array<any>
-  displayCards: Array<ICard>
+  displayCards: Array<IRefCard>
   queryText: string = ""
-  subscription : Subscription
+  user: IUser
+  loader : Loading
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public dataService: DataService,
+    public authService: AuthService,
     private loadingController: LoadingController,
     private alertController: AlertController,
-    private toastController: ToastController) { }
+    private toastController: ToastController) {
+
+  }
 
   ngOnInit() {
-
-    this.allCards=[]
-    this.subscription=this.dataService.getListOfCards(true)
-      .subscribe((card) => {
-        this.allCards.push(card)
-        this.sortCards()
-      },
-      (err) => {
-        console.log(err)
+    this.loader = this.loadingController.create({
+      content: 'gettin user info...',
+    });
+    this.loader.present()
+      .then(() => {
+        this.authService.getCurrentUser()
+          .then(user => {
+            this.user = user
+            console.log("this user" + this.user.fullName)
+            this.sortCards()
+            this.loader.dismiss().catch(() => console.log("error in dismissing"))
+          })
+      }).catch(err => {
+        this.loader.dismiss().catch(() => console.log("error in dismissing"))
+        console.log("can't get user" + err)
       })
   }
-  
-  ngOnDestroy(){this.subscription.unsubscribe}
+  ngOnDestroy(){
+    this.loader.dismiss()
+  }
 
+  refreshAll(refresher) {
+    refresher.complete()
+    this.ngOnInit()
+  }
 
   sortCards() {
     this.categorizedCards =
-      _.chain(this.allCards)
+      _.chain(this.user.allocatedCards)
         //for each team in array
         .filter(card => {
           if (!this.queryText || card.name.toLocaleLowerCase().includes(this.queryText.toLocaleLowerCase()))
@@ -60,7 +74,7 @@ export class AllcardsListPage implements OnInit, OnDestroy {
     this.displayCards = this.categorizedCards
   }
 
-  pushToCardDetails($event, card) {
+  pushToCardDetails($event, card: IRefCard) {
     this.navCtrl.push(CardDetailsPage, card)
   }
 

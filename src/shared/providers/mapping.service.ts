@@ -14,14 +14,16 @@ export class MappingService {
             commants: user.commants ? MappingService.arrangeCommantsToArray(user.commants) : [],
             counterComments: user.commants ? Object.keys(user.commants).length : 0,
             favoriteCards: user.favoriteCards ? MappingService.arrangeCardsToArray(user.favoriteCards) : [],
+            votes: user.votes? MappingService.arrangeCommantsToArray(user.votes) : [],
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
             phone: user.phone,
             school: user.school,
             username: user.username,
-            fullName: user.firstName + user.lastName,
-            key: user.$key //this is the Uid from the auth      
+            fullName: user.firstName + " " + user.lastName,
+            key: user.$key, //this is the Uid from the auth      
+            img : user.img? user.img : ""
         }
         return userToSet
     }
@@ -68,13 +70,25 @@ export class MappingService {
             date: commant.date,
             key: commant.$key,
             title: commant.title,
-            userDetails: commant.userDetails
+            userDetails: commant.userDetails,
+            img : commant.img? commant.img : null,
+            votes: commant.votes? commant.votes : [],
+            votesCounter: commant.votes? Object.keys(commant.votes).length-1 : 0  
         })
     }
     ////////////////////////////school///////////////////////////////////////////////////////////////
 
     static mapSchoolfromDbToApp(school): ISchool {
         return ({ key: school.$key, name: school.name })
+    }
+    ////////////////////////////categories///////////////////////////////////////////////////////////////
+    static mapCategoriesObjectIntoArray(categories) : Array<{name : string}> {
+        let catArray : Array<{name : string}> =[]
+        categories.
+        Object.keys(categories).forEach(ky=>{
+            catArray.push({name : ky})
+        })
+        return catArray
     }
     ////////////////////////////references///////////////////////////////////////////////////////////////
     /////////////users///////////
@@ -120,7 +134,7 @@ export class MappingService {
     private static arrangeCardsToArray(allocatedCards): Array<IRefCard> {
         let cardArray: Array<IRefCard> = []
         Object.keys(allocatedCards).forEach(ky => {
-            cardArray.push({ key: ky, name: allocatedCards[ky].name })
+            cardArray.push({key: ky, name: allocatedCards[ky].name, category: allocatedCards[ky].category})
         })
         return cardArray
     }
@@ -128,7 +142,7 @@ export class MappingService {
     private static arrangeCardsToObject(cardArray: Array<IRefCard>): Object {
         let cardObj = {}
         cardArray.map(card => {
-            cardObj[card.key] = { name: card.name }
+            cardObj[card.key] = { name: card.name, category: card.category }
         })
         return cardObj
     }

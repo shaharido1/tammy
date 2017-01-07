@@ -13,29 +13,32 @@
 
 
 <ion-content>
-  <ion-card *ngIf="card.urlToFile">
-    <img [src]="card.urlToFile" />
+  <ion-refresher (ionRefresh)="refreshAll($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-card *ngIf="cardToShow==true">
+    <img [src]="card.urlToFile? card.urlToFile : 'assets/images/ring.gif'" />
   </ion-card>
-  <ion-card *ngIf="!card.urlToFile">
+  <ion-list *ngIf="commants">
+    <ion-item *ngFor="let commant of commants">
+      <ion-thumbnail item-left (click)="profilePick($event, commant)">
+        <img [src]="commant.img" />
+      </ion-thumbnail>
+      <h2>{{commant.userDetails.fullName + ": " + commant.title}}</h2>
+      <p class="item item-text-wrap" (click)="showFullComment($event, commant)">{{commant.summary? (commant.contnet | shorten: 300) : (commant.contnet) }}</p>
+      <ion-row>
+        <p>{{commant.date | date:'medium'}}</p>
+        <ion-icon [name]="commant.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'" (click)="like($event, commant)"></ion-icon>
+        <p>{{commant.votesCounter}} likes</p>
+      </ion-row>
+    </ion-item>
+  </ion-list>
+  <ion-card *ngIf="!commants">
     <h2>loading...</h2>
-    <img src="assets/images/ring.gif" style="display:block; margin:auto" />
-</ion-card>
-<ion-list *ngIf="commants">
-  <button ion-item *ngFor="let commant of commants" (click)="itemTapped($event, property)">
-            <ion-thumbnail item-left>
-                <img src=""/>
-            </ion-thumbnail>
-            <h2>{{commant.userDetails.fullName + ": " + commant.title}}</h2>
-            <p>{{commant.contnet | shorten: 50}}</p>
-            <p>{{commant.date | date:'medium'}}</p>
-        </button>
-</ion-list>
-<ion-card *ngIf="!commants">
-  <h2>loading...</h2>
-  <img [src]="assets/images/ring.gif" />
-</ion-card>
-<ion-item *ngIf="!commants"> no commants to show </ion-item>
-<ion-fab right bottom>
-  <button ion-fab color="primary"><ion-icon name="create" (click)="createComment()"></ion-icon></button>
-</ion-fab>
+    <img [src]="assets/images/ring.gif" />
+  </ion-card>
+  <ion-item *ngIf="!commants"> no commants to show </ion-item>
+  <ion-fab right bottom>
+    <button ion-fab color="primary"><ion-icon name="create" (click)="createComment()"></ion-icon></button>
+  </ion-fab>
 </ion-content>

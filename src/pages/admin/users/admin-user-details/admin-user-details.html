@@ -24,7 +24,9 @@
 
 
 <ion-content padding>
-
+   <ion-refresher (ionRefresh)="refreshAll($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
   <ion-list>
     <ion-list-header>
       all cards

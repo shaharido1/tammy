@@ -12,6 +12,8 @@ export class IUser {
     commants?: Array<ICommantRef>
     fullName: string;
     favoriteCards? : Array<IRefCard>
+    votes? : Array<ICommantRef>
+    img? : string
 }
 
 export interface ISchool {
@@ -27,6 +29,7 @@ export interface ICommantRef {
 export interface IRefCard {
     key: string
     name: string
+    category : string
 }
 
 export interface IRefUser {
@@ -36,8 +39,11 @@ export interface IRefUser {
 }
 
 export interface IComment {
+    votes? : Array<IRefUser>,
+    votesCounter? : number,
     key?: string
     userDetails?: IRefUser
+    img? : string
     cardDetails?: IRefCard
     title: string
     contnet: string
@@ -47,16 +53,12 @@ export interface IComment {
 export interface ICard {
     key: string
     name: string;
-    category: categories;
+    category: string;
     urlToFile: string
     allocatedUsers: Array<IRefUser>
     commants: Array<ICommantRef>
 }
 
-export interface categories {
-    key : string
-    name : string
-}
 
 export class ErrorMesseges {
     public static premissonDenied: string = "Error: PERMISSION_DENIED: Permission denied"
@@ -75,11 +77,15 @@ export const Paths = {
     allocatedUsers:"allocatedUsers",
     allocatedCards: "allocatedCards",
     commants: "commants",
-    admins: "admins"
+    admins: "admins",
+    votes: "votes"
 }
 
 export const EventsTypes = {
     firebaseConnected : "firebaseConnected",
     firebaseDisconnected : "firebaseDisconnected",
-    userConnected : "userConnected"
+    userConnected : "userConnected",
+    userUpdated : "userUpdated",
+    cardUpdated : "cardUpdated",
+    userIsAdmin : "userIsAdmin"
 }

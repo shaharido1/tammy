@@ -13,6 +13,9 @@
 
 
 <ion-content padding>
+      <ion-refresher (ionRefresh)="refreshAll($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
   <form [formGroup]="cardForm" (ngSubmit)="saveUpdateCard(cardForm.value)">
     <ion-list>
       <ion-list-header>card detail</ion-list-header>
