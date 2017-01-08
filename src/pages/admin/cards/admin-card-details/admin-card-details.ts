@@ -88,7 +88,7 @@ export class AdminCardDetailsPage implements OnInit, OnDestroy {
   } 
   ngOnDestroy(){
     console.log("unsubscribe from all users list")
-  this.subscription.unsubscribe()
+    this.subscription.unsubscribe()
   }
 
   mapUsersForTuggole() {

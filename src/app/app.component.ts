@@ -1,9 +1,10 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController, Events } from 'ionic-angular';
-import { StatusBar, Splashscreen } from 'ionic-native';
-import {EventsTypes} from './../shared/interfaces'
+import { Network, StatusBar, Splashscreen } from 'ionic-native';
+import { EventsTypes } from './../shared/interfaces'
 import { DataService, AuthService } from './../shared/providers/providers'
 import { LoginPage, TabsPage, AdminCardsListPage, AboutPage, SchoolListPage, AdminUsersListPage, AllcardsListPage } from './../pages/pages';
+
 @Component({
   templateUrl: 'app.html'
 })
@@ -18,8 +19,8 @@ export class MyApp implements OnInit {
     public authService: AuthService,
     public dataService: DataService,
     public menu: MenuController,
-    public events : Events
-  ) {
+    public events: Events) 
+    {
     this.initializeApp();
 
     this.userPages = [
@@ -32,19 +33,60 @@ export class MyApp implements OnInit {
       { title: "manage schools", component: SchoolListPage, icon: 'book' },
       { title: "manage users", component: AdminUsersListPage, icon: 'people' }
     ]
-    this.events.subscribe(EventsTypes.userIsAdmin, ()=>this.admin=true)
+    this.events.subscribe(EventsTypes.userIsAdmin, () => this.admin = true)
 
   }
 
   initializeApp() {
+    //plugins are available.
     this.platform.ready().then(() => {
+      //statusbar of phone battery, etc.
       StatusBar.styleDefault();
-      Splashscreen.hide();
+      //plashscreen - where the app is loded. change "resource", and config.xml
+      Splashscreen.show();
+      //monitor connection throught the app
+      this.watchForConnection();
+      this.watchForDisconnect();
+      //our own sqlite service init
+      //if you need to do platform specific things.. 
+      //console.log('in ready..');
+      //let array: string[] = platform.platforms();
+      //console.log(array); 
+    });
+  }
+
+  watchForConnection() {
+    debugger
+    Network.onConnect().subscribe(() => {
+      debugger
+      console.log('network connected!');
+      // We just got a connection but we need to wait briefly
+      // before we determine the connection type.  Might need to wait
+      // prior to doing any api requests as well.
+      setTimeout(() => {
+        console.log('we got a connection..');
+        console.log('Firebase: Go Online..');
+        //let firebase service know we're online
+        this.dataService.goOnline();
+        //let all cmp now we are online
+        this.events.publish(EventsTypes.networkConnected);
+      }, 3000);
+    });
+  }
+
+  watchForDisconnect() {
+    // watch network for a disconnect
+    Network.onDisconnect().subscribe(() => {
+      console.log('network was disconnected :-(');
+      console.log('Firebase: Go Offline..');
+      //self.sqliteService.resetDatabase();
+      this.dataService.goOffline();
+      this.events.publish(EventsTypes.networkDisconnected);
     });
   }
 
   ngOnInit() {
-    var that=this//later will verifay admin//
+    var that = this
     this.authService.getCurrentUser().then((user) => {
       if (user) {
         this.rootPage = TabsPage

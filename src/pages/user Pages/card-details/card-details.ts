@@ -35,18 +35,16 @@ export class CardDetailsPage implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private toastController: ToastController, public events: Events) {
     this.cardRef = this.navParams.data
-    this.events.subscribe(EventsTypes.cardUpdated, () => {
+    this.events.subscribe(EventsTypes.commentCreated, () => {
       this.commants = []
       this.ngOnInit()
     })
   }
 
-
   ngOnInit() {
     console.log("oninit")
-
     this.loader = this.loadingController.create({
-      content: 'gettin user info...',
+      content: 'gettin card info...',
     });
     this.loader.present().then(() => {
       Promise.all([
@@ -62,7 +60,6 @@ export class CardDetailsPage implements OnInit, OnDestroy {
         if (this.card.commants[0].key) {
           this.getCommants()
             .then(() => {
-              this.mapCommentForlikeAndFullShow()
               this.loader.dismiss().catch(() => console.log("error in dismissing"))
             })
             .catch(() => this.loader.dismiss().catch(() => console.log("error in dismissing"))
@@ -85,8 +82,18 @@ export class CardDetailsPage implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.subscription = this.dataService.getCommantsByList(this.card.commants)
         .subscribe(commant => {
+          let com : any = commant
           console.log(commant)
-          this.commants.push(commant)
+          com.summary = false
+          com.showAllLikes = false
+          com.isLiked = commant.votes[this.user.key] ? true : false
+          if (commant.votes) {
+            com.fullNameString = ""
+            commant.votes.map(user=>{
+              com.fullNameString = com.fullNameString + " ," + user.fullName 
+            })
+          }
+          this.commants.push(com)
           resolve()
         }, err => {
           console.log(err)
@@ -98,24 +105,18 @@ export class CardDetailsPage implements OnInit, OnDestroy {
     })
   }
 
-  mapCommentForlikeAndFullShow() {
-    this.commants.map(commant => {
-      commant.summary = true
-      commant.isLiked = commant.votes[this.user.key] ? true : false
-    })
+  showAllLikes(commant) {
+    commant.showAllLikes = !commant.showAllLikes
   }
 
   showFullComment($event, commant) {
-    debugger
     commant.summary = !commant.summary
-    console.log("comment tap")
   }
 
   profilePick() { console.log("profile tapp") }
 
   like($event, commant) {
     this.subscription.unsubscribe()
-    console.log($event)
     this.loader = this.loadingController.create({
       content: 'working..',
     });
@@ -126,7 +127,6 @@ export class CardDetailsPage implements OnInit, OnDestroy {
           // this.commants = []
           // this.getCommants().then(() => {
           // this.mapCommentForlikeAndFullShow()
-          commant.votesCounter = commant.isLiked? commant.votesCounter+1 : commant.votesCounter-1
           this.loader.dismiss().catch(() => console.log("error in dismissing"))
         })
         .catch((err) => {
@@ -136,6 +136,7 @@ export class CardDetailsPage implements OnInit, OnDestroy {
     })
   }
 
+  commentOnComment() { }
   checkFavorite() {
     this.user.favoriteCards.find((card) => {
       return card.key == this.card.key

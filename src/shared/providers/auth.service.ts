@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { FirebaseAuthState, AngularFire, AngularFireAuth } from 'angularfire2';
 import { EmailPasswordCredentials } from './../../../node_modules/angularfire2/auth/auth_backend.d'
-import { IUser, Paths, EventsTypes } from './../interfaces'
+import { IUser, Paths, EventsTypes, storageKeys } from './../interfaces'
 import { MappingService } from './mapping.service'
 import { Events } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
 
 @Injectable()
 export class AuthService {
   auth: AngularFireAuth
   user: IUser
-  constructor(public angularFire: AngularFire, public events: Events) {
+  constructor(public angularFire: AngularFire, public events: Events, public storage : Storage) {
     this.getCurrentUser()
+    this.events.subscribe(EventsTypes.userUpdated, ()=> this.getCurrentUser() )
   }
   ///inject firebase - for delete, change password, etc. 
   createUser(user): Promise<AngularFireAuth> {
@@ -77,11 +79,13 @@ export class AuthService {
 
   getUserData(auth: FirebaseAuthState): Promise<IUser> {
     return new Promise((resolve, reject) => {
-      this.angularFire.database.object(`${Paths.users}/${auth.uid}`)
+      let subscriber = this.angularFire.database.object(`${Paths.users}/${auth.uid}`)
         .subscribe((user) => {
           this.user = MappingService.mapUserfromDbToApp(user)
-          this.events.publish(EventsTypes.userConnected, this.user)
+          this.storage.set(storageKeys.user, this.user)
+          this.events.publish(EventsTypes.userUpdated, this.user)
           resolve(this.user)
+          subscriber.unsubscribe()
         }, err => {
           console.log(err + "error in database")
           reject(err)

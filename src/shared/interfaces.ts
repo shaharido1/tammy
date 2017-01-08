@@ -84,8 +84,15 @@ export const Paths = {
 export const EventsTypes = {
     firebaseConnected : "firebaseConnected",
     firebaseDisconnected : "firebaseDisconnected",
-    userConnected : "userConnected",
+    networkConnected: "networkConnected",
+    networkDisconnected: "networkDisconnected",
     userUpdated : "userUpdated",
     cardUpdated : "cardUpdated",
-    userIsAdmin : "userIsAdmin"
+    userIsAdmin : "userIsAdmin",
+    commentCreated: "commentCreated"
+}
+
+export const storageKeys = {
+    categories : "categories",
+    user : "user"
 }

@@ -5,9 +5,13 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/find';
 import 'rxjs/add/operator/filter';
 import { Observable } from 'rxjs/Observable';
-import { Paths, IUser, IRefCard, IRefUser, ICard, ISchool, IComment, ICommantRef, EventsTypes } from './../interfaces';
+import { Paths, IUser, IRefCard, IRefUser, ICard, ISchool, IComment, ICommantRef, EventsTypes, storageKeys } from './../interfaces';
 import { MappingService } from './mapping.service'
 import * as _ from 'lodash'
+import { Storage } from '@ionic/storage';
+
+declare var firebase: any;
+
 @Injectable()
 export class DataService {
     connectionRef: any
@@ -18,21 +22,24 @@ export class DataService {
     usersRef: any
     user: IUser
     public connected: boolean = false;
-
-    constructor(private angularFire: AngularFire, public events: Events) {
+    constructor(private angularFire: AngularFire, public events: Events, public storage : Storage) {
         this.initialaizeService()
         console.log("entered data service")
         this.root = this.angularFire.database.object(Paths.root)
         this.connectionRef = this.angularFire.database.object(Paths.infoConnected)
-        this.cards = this.angularFire.database.list(Paths.cards)
-        events.subscribe(EventsTypes.userConnected, (user) => {
-            this.user = user
+        events.subscribe(EventsTypes.userUpdated, (user) => {
+        //this.storage.get(storageKeys.user).then( (user)=>{
+                this.user=user
         })
     }
+
     initialaizeService() {
         this.checkFirebaseConnection();
         this.getCategories()
     }
+
+    goOffline() {firebase.database().goOffline()}
+    goOnline() {firebase.database().goOnline()}
 
 
     checkFirebaseConnection() {
@@ -109,7 +116,7 @@ export class DataService {
         let upRef = {}
         let finish: boolean = false
         upRef[`${Paths.users}`] = null
-        this.cards.subscribe((res) => {
+        this.angularFire.database.list(Paths.cards).subscribe((res) => {
             res.map((card) =>
                 upRef[`${Paths.cards}/${card.key}/${Paths.allocatedUsers}`] = null
             )
@@ -222,7 +229,7 @@ export class DataService {
         }
         else {
             this.angularFire.database.list(Paths.categories).subscribe((res) => {
-                console.log(res[0].name)
+                this.storage.set(storageKeys.categories, this.categories)
                 this.categories = res
                 return this.categories
             })
@@ -230,20 +237,16 @@ export class DataService {
     }
     ///////////////////////////////////commants////////////////////////////////////////////////////
     updateVote(user, commant, isLiked) {
-            let upref = {}
-            upref[`${Paths.commants}/${commant.key}/${Paths.votes}/${user.key}`] = isLiked ? true : null
-            upref[`${Paths.users}/${user.key}/${Paths.votes}/${commant.key}`] = isLiked ? true : null
-            return this.root.update(upref)
+        let upref = {}
+        upref[`${Paths.commants}/${commant.key}/${Paths.votes}/${user.key}`] = isLiked ? {fullName : user.fullName} : null
+        upref[`${Paths.users}/${user.key}/${Paths.votes}/${commant.key}`] = isLiked ? {title : commant.title} : null
+        return this.root.update(upref)
     }
 
     setNewCommant(commant: IComment): Promise<any> {
-
         return new Promise((resolve, reject) => {
-
             this.angularFire.database.list(Paths.commants).push(commant).then(
                 (data) => {
-                    debugger
-
                     console.log(data.path.o[1])
                     let commantkey: string = data.path.o[1]
                     let upref = {}
@@ -260,7 +263,6 @@ export class DataService {
                 this.angularFire.database.object(`${Paths.commants}/${commant.key}`)
                     .subscribe(responseCommant => {
                         debugger
-                        console.log("commant response" + commant.$key)
                         observer.next(MappingService.mapCommantFromDbToApp(responseCommant))
                     }, err => observer.error(err)
                     )

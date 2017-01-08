@@ -14,48 +14,51 @@
         </ion-buttons>
     </ion-navbar>
 </ion-header>
+
 <ion-content>
-    <div *ngIf="!userDataLoaded">
-        <img src="assets/images/ring.gif" style="display:block; margin:auto" />
-</div>
-<ion-list no-border *ngIf="user">
-    <ion-list-header>
-        Basic Info
-    </ion-list-header>
-    <ion-item>
-        <ion-thumbnail item-left>
-        </ion-thumbnail>
-        <h2>{{user.username}}</h2>
-        <p>{{user.email}}</p>
-    </ion-item>
-
-    <ion-item>
-        <ion-icon name='cloud-upload' item-left></ion-icon>
-        <ion-note item-right>
-            what is missing here
-        </ion-note>
-    </ion-item>
-
-</ion-list> 
-
-
-<ion-list *ngIf="user">
-
-    <ion-list-header>
-        Activity
-    </ion-list-header>
-
-    <ion-item *ngFor="let commant of user.commants">
-        # Comments
-        <h2>{{commant.name}}</h2>
-        <ion-icon name='quote' item-left></ion-icon>
-        <ion-badge item-right>user commants</ion-badge>
-    </ion-item>
-    <ion-item>
-        # Favorites
-        <ion-icon name='heart' item-left></ion-icon>
-        <ion-badge item-right>user fav</ion-badge>
-    </ion-item>
-
-</ion-list>
+    <ion-card *ngIf="userDataLoaded==true">
+        <ion-card-content>
+            <ion-avatar item-left>
+                <img [src]="user.img">
+            </ion-avatar>
+            <h2>{{user.fullName}}</h2>
+            <p>{{user.email}}</p>
+        </ion-card-content>
+    </ion-card>
+    <ion-card *ngIf="userDataLoaded==true">
+        <ion-card-header>user details</ion-card-header>
+        <ion-card-content>
+            <ion-list>
+                <ion-item>phone: {{user.phone}}</ion-item>
+                <ion-item>school: {{user.school}}</ion-item>
+                <ion-item>first name: {{user.firstName}}</ion-item>
+                <ion-item>last name: {{user.lastName}}</ion-item>
+                <ion-item>username: {{user.username}}</ion-item>
+                <ion-item>email: {{user.email}}</ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+    <ion-card *ngIf="userDataLoaded==true">
+        <ion-card-header>
+            Activity
+        </ion-card-header>
+        <ion-card-content>
+            <ion-list>
+                <ion-list-header>
+                    <h2>user topics</h2>
+                </ion-list-header>
+                <ion-item *ngFor="let commant of user.commants">
+                    <button ion-button  (click)="showComant(commant)">{{commant.title}}</button>
+                </ion-item>
+            </ion-list>
+            <ion-list>
+                <ion-list-header>
+                    <h2>user commants</h2>
+                </ion-list-header>
+                <ion-item *ngFor="let commant of user.votes">
+                    <button  outline ion-button (click)="showComant(commant)">{{commant.title}}</button>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
 </ion-content>

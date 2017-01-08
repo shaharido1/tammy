@@ -40,6 +40,8 @@ export class FavoritesCardsPage implements OnInit {
       .then(() => {
         this.authService.getCurrentUser()
           .then(user => {
+          console.log("subscribe to user")
+          debugger
             this.user = user
             this.isUser = true;
             this.loader.dismiss().catch(() => console.log("error in dismissing"))

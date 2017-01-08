@@ -17,6 +17,7 @@ export class AllcardsListPage implements OnInit, OnDestroy {
   queryText: string = ""
   user: IUser
   loader : Loading
+  subscription : Subscription
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public dataService: DataService,
@@ -37,6 +38,8 @@ export class AllcardsListPage implements OnInit, OnDestroy {
           .then(user => {
             this.user = user
             console.log("this user" + this.user.fullName)
+            debugger
+            console.log("subscribe to user")
             this.sortCards()
             this.loader.dismiss().catch(() => console.log("error in dismissing"))
           })
@@ -46,6 +49,7 @@ export class AllcardsListPage implements OnInit, OnDestroy {
       })
   }
   ngOnDestroy(){
+    console.log("unsubscribe from user")
     this.loader.dismiss()
   }
 

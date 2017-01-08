@@ -20,18 +20,46 @@
     <img [src]="card.urlToFile? card.urlToFile : 'assets/images/ring.gif'" />
   </ion-card>
   <ion-list *ngIf="commants">
-    <ion-item *ngFor="let commant of commants">
-      <ion-thumbnail item-left (click)="profilePick($event, commant)">
-        <img [src]="commant.img" />
-      </ion-thumbnail>
-      <h2>{{commant.userDetails.fullName + ": " + commant.title}}</h2>
-      <p class="item item-text-wrap" (click)="showFullComment($event, commant)">{{commant.summary? (commant.contnet | shorten: 300) : (commant.contnet) }}</p>
+    <ion-card *ngFor="let commant of commants">
+      <ion-card-header>
+        <ion-row>
+          <ion-col>
+            <ion-thumbnail wight=80px height=80px item-left (click)="profilePick($event, commant)">
+              <img [src]="commant.img" />
+            </ion-thumbnail>
+          </ion-col>
+          <ion-col>
+            <h2>{{commant.userDetails.fullName + ": " + commant.title}}</h2>
+            <p>{{commant.date | date:'medium'}}</p>
+          </ion-col>
+        </ion-row>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="item item-text-wrap" (click)="showFullComment($event, commant)">{{commant.summary? (commant.contnet) : (commant.contnet | shorten: 300) }}</p>
+      </ion-card-content>
       <ion-row>
-        <p>{{commant.date | date:'medium'}}</p>
-        <ion-icon [name]="commant.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'" (click)="like($event, commant)"></ion-icon>
-        <p>{{commant.votesCounter}} likes</p>
+        <ion-col>
+          <button ion-button icon-left clear small (click)="like($event, commant)">
+            <ion-icon [name]="commant.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'"></ion-icon>
+            <p>like<p>
+              
+
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button icon-left clear small (click)="commentOnComment($event, commant)">
+            <ion-icon name="text"></ion-icon>
+            <p>comments</p>
+          </button>
+        </ion-col>
       </ion-row>
-    </ion-item>
+      <ion-row>
+        <p (click)="showAllLikes(commant)">{{commant.votesCounter}} likes {{commant.isLiked? 'you' : '' }} 
+            {{commant.showAllLikes? (commant.fullNameString) : (commant.fullNameString | shorten: 10) }} 
+        </p>
+      </ion-row>
+
+    </ion-card>
   </ion-list>
   <ion-card *ngIf="!commants">
     <h2>loading...</h2>

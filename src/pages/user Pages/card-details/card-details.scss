@@ -13,3 +13,16 @@ ion-row.warning {
 ion-row.error {
   background-color: #f2dede;
 }
+
+img.profilepicsize  {
+    width: 50px !important;  
+    height : 50px !important;  
+    max-width: 50px !important;  //any size
+    max-height: 50px !important; //any size 
+}
+img.profilepicposition  {
+    position: absolute;
+    top: -80%;
+    right: 0%;
+    z-index: 89;
+}

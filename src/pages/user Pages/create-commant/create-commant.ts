@@ -66,7 +66,7 @@ export class CreateCommantPage {
           .then(() => {
             loader.dismiss()
               .then(() => {
-                this.events.publish(EventsTypes.cardUpdated)
+                this.events.publish(EventsTypes.commentCreated)
                 this.nav.pop()
               })
               .catch((err) => console.log(err))

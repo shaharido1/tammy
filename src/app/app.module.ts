@@ -10,7 +10,7 @@ import {LoginPage, SignUpPage, TabsPage, AllcardsListPage,
         SchoolDetailPage, AdminUserDetailsPage, AdminUsersListPage,
         FavoritesCardsPage, CardDetailsPage, CreateCommantPage} from './../pages/pages';
 import {DataService, AuthService, StorageService, Shorten} from './../shared/providers/providers'
-
+import { Storage } from '@ionic/storage';
 
 @NgModule({
   declarations: [
@@ -46,6 +46,6 @@ import {DataService, AuthService, StorageService, Shorten} from './../shared/pro
     AdminCardsListPage, AdminUserDetailsPage, AdminUsersListPage,
     AllcardsListPage, FavoritesCardsPage, CardDetailsPage, CreateCommantPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, DataService, AuthService, StorageService]
+  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, Storage, DataService, AuthService, StorageService]
 })
 export class AppModule {}

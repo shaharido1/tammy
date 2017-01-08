@@ -12,6 +12,6 @@ import { Injectable, Pipe } from '@angular/core';
 @Injectable()
 export class Shorten {
   transform(value, limit : string) : string {
-  return value.length>limit? value.substring(0, limit) + "countinue..." : value;
+  return value.length>limit? value.substring(0, limit) + "COUNTINUE..." : value;
   }
 }

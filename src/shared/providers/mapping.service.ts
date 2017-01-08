@@ -64,6 +64,7 @@ export class MappingService {
     ////////////////////////////commant///////////////////////////////////////////////////////////////
 
     static mapCommantFromDbToApp(commant): IComment {
+        debugger
         return ({
             cardDetails: commant.cardDetails,
             contnet: commant.contnet,
@@ -72,10 +73,11 @@ export class MappingService {
             title: commant.title,
             userDetails: commant.userDetails,
             img : commant.img? commant.img : null,
-            votes: commant.votes? commant.votes : [],
-            votesCounter: commant.votes? Object.keys(commant.votes).length-1 : 0  
+            votes: commant.votes? MappingService.arrangeUsersToArray(commant.votes) : [],
+            votesCounter: commant.votes? Object.keys(commant.votes).length : 0  
         })
     }
+
     ////////////////////////////school///////////////////////////////////////////////////////////////
 
     static mapSchoolfromDbToApp(school): ISchool {
