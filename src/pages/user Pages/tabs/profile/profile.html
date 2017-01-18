@@ -45,18 +45,34 @@
         <ion-card-content>
             <ion-list>
                 <ion-list-header>
-                    <h2>user topics</h2>
+                    <h2>user own topics </h2>
                 </ion-list-header>
-                <ion-item *ngFor="let commant of user.commants">
-                    <button ion-button  (click)="showComant(commant)">{{commant.title}}</button>
+                <ion-item *ngFor="let topic of user.ownTopics">
+                    <button ion-button (click)="goToTopic(topic)">{{topic.title}}</button>
                 </ion-item>
             </ion-list>
             <ion-list>
                 <ion-list-header>
-                    <h2>user commants</h2>
+                    <h2>user liked Topics</h2>
                 </ion-list-header>
-                <ion-item *ngFor="let commant of user.votes">
-                    <button  outline ion-button (click)="showComant(commant)">{{commant.title}}</button>
+                <ion-item *ngFor="let topic of user.likedTopics">
+                    <button ion-button (click)="goToTopic(topic)">{{topic.title}}</button>
+                </ion-item>
+            </ion-list>
+            <ion-list>
+                <ion-list-header>
+                    <h2>user own comments</h2>
+                </ion-list-header>
+                <ion-item *ngFor="let comment of user.ownComments">
+                    <button ion-button (click)="goToComment(comment)">{{comment.content}}</button>
+                </ion-item>
+            </ion-list>
+            <ion-list>
+                <ion-list-header>
+                    <h2>user liked comments</h2>
+                </ion-list-header>
+                <ion-item *ngFor="let comment of user.likedComments">
+                    <button ion-button (click)="goToComment(comment)">{{comment.content}}</button>
                 </ion-item>
             </ion-list>
         </ion-card-content>

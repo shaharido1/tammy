@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular';
+import { NavController, NavParams, ToastController, LoadingController, Events } from 'ionic-angular';
 import { DataService, AuthService } from './../../../../shared/providers/providers'
 import { AdminUsersListPage, AdminCardDetailsPage } from './../../../pages'
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { IUser, ICard, IRefCard, ErrorMesseges } from './../../../../shared/interfaces'
+import { IUser, ICard, IRefCard, ErrorMesseges, storageKeys, EventsTypes } from './../../../../shared/interfaces'
 import { Subscription } from 'rxjs/Subscription'
+import { Storage } from '@ionic/storage';
 
 import * as _ from 'lodash'
 
@@ -27,7 +28,9 @@ export class AdminUserDetailsPage implements OnInit, OnDestroy {
     public dataService: DataService,
     public authService: AuthService,
     private formBuilder: FormBuilder,
-    private loadingController: LoadingController) {
+    private loadingController: LoadingController,
+    public storage : Storage,
+    public events : Events) {
     this.user = this.navParams.data
     console.log(this.user)
     Object.assign(this.oldCardAllocation, this.user.allocatedCards)
@@ -125,7 +128,12 @@ export class AdminUserDetailsPage implements OnInit, OnDestroy {
 
   saveUser() {
     this.dataService.updateUser(this.user, this.oldCardAllocation)
-      .then(() => this.onSuccess())
+      .then(() => {
+        this.storage.get(storageKeys.user).then(user=>{
+          if (user.key=this.user.key) {this.events.publish(EventsTypes.userUpdated)}
+        })
+        this.onSuccess()
+      })
       .catch((err) => this.onFail(err))
   }
 

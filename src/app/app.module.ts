@@ -8,7 +8,7 @@ import {LoginPage, SignUpPage, TabsPage, AllcardsListPage,
         ProfilePage, AdminCardDetailsPage, 
         AboutPage, AdminCardsListPage, SchoolListPage, 
         SchoolDetailPage, AdminUserDetailsPage, AdminUsersListPage,
-        FavoritesCardsPage, CardDetailsPage, CreateCommantPage} from './../pages/pages';
+        FavoritesCardsPage, CardDetailsPage, CreateTopicPage} from './../pages/pages';
 import {DataService, AuthService, StorageService, Shorten} from './../shared/providers/providers'
 import { Storage } from '@ionic/storage';
 
@@ -29,7 +29,7 @@ import { Storage } from '@ionic/storage';
     AllcardsListPage,
     FavoritesCardsPage,
     CardDetailsPage,
-    CreateCommantPage,
+    CreateTopicPage,
     Shorten
 
   ],
@@ -44,7 +44,7 @@ import { Storage } from '@ionic/storage';
     MyApp, LoginPage, SignUpPage, TabsPage, ProfilePage,
     AboutPage,  SchoolListPage, SchoolDetailPage, AdminCardDetailsPage,
     AdminCardsListPage, AdminUserDetailsPage, AdminUsersListPage,
-    AllcardsListPage, FavoritesCardsPage, CardDetailsPage, CreateCommantPage
+    AllcardsListPage, FavoritesCardsPage, CardDetailsPage, CreateTopicPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, Storage, DataService, AuthService, StorageService]
 })

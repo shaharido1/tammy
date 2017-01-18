@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NavController, NavParams, LoadingController, AlertController, ToastController, Loading } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, AlertController, ToastController, Loading, Events } from 'ionic-angular';
 import { DataService, AuthService } from './../../../shared/providers/providers'
-import { ICard, IUser, IRefCard } from './../../../shared/interfaces'
+import { ICard, IUser, IRefCard, EventsTypes } from './../../../shared/interfaces'
 import * as _ from 'lodash'
 import { CardDetailsPage } from './../../pages'
 import { Subscription } from 'rxjs/Subscription.d'
-
 @Component({
   selector: 'page-all-user-cards',
   templateUrl: 'all-cards-list.html'
@@ -16,15 +15,16 @@ export class AllcardsListPage implements OnInit, OnDestroy {
   displayCards: Array<IRefCard>
   queryText: string = ""
   user: IUser
-  loader : Loading
-  subscription : Subscription
+  loader: Loading
+  subscription: Subscription
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public dataService: DataService,
     public authService: AuthService,
     private loadingController: LoadingController,
     private alertController: AlertController,
-    private toastController: ToastController) {
+    private toastController: ToastController,
+    public events: Events) {
 
   }
 
@@ -34,27 +34,29 @@ export class AllcardsListPage implements OnInit, OnDestroy {
     });
     this.loader.present()
       .then(() => {
-        this.authService.getCurrentUser()
-          .then(user => {
+        this.subscription=this.authService.getCurrentUser()
+          .subscribe(user => {
             this.user = user
             console.log("this user" + this.user.fullName)
-            debugger
             console.log("subscribe to user")
             this.sortCards()
             this.loader.dismiss().catch(() => console.log("error in dismissing"))
+          }, err => {
+            this.loader.dismiss().catch(() => console.log("error in dismissing"))
+            console.log("can't get user" + err)
           })
-      }).catch(err => {
-        this.loader.dismiss().catch(() => console.log("error in dismissing"))
-        console.log("can't get user" + err)
       })
   }
-  ngOnDestroy(){
+
+  ngOnDestroy() {
     console.log("unsubscribe from user")
     this.loader.dismiss()
+    this.subscription.unsubscribe()
   }
 
   refreshAll(refresher) {
     refresher.complete()
+    this.events.publish(EventsTypes.userUpdated)
     this.ngOnInit()
   }
 

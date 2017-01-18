@@ -6,67 +6,127 @@
       <button ion-button icon-only (click)="favorCard()">
         <ion-icon [name]="favorite? 'heart' : 'heart-outline'"></ion-icon>
       </button>
+      <button ion-button icon-only (click)="createTopic()">
+        <ion-icon name="create"></ion-icon>
+     </button>
+      <button ion-button icon-only (click)="showVideo()">
+        <ion-icon name="videocam"></ion-icon>
+     </button>
     </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 
 <ion-content>
+  <!--refresher-->
   <ion-refresher (ionRefresh)="refreshAll($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <!--card as image-->
   <ion-card *ngIf="cardToShow==true">
-    <img [src]="card.urlToFile? card.urlToFile : 'assets/images/ring.gif'" />
+    <img [src]="card.urlToFile? card.urlToFile : '../../../assets/images/ring.gif'" />
   </ion-card>
-  <ion-list *ngIf="commants">
-    <ion-card *ngFor="let commant of commants">
+  <ion-card *ngIf="isShowVideo">
+    <video controls="controls" preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer">
+      <source src="https://firebasestorage.googleapis.com/v0/b/studentattendence.appspot.com/o/movies%2FShort%20video%20clip-nature.mp4-SD.mp4?alt=media&token=391fbd40-1295-46ed-8924-e2f351855a4c"
+        type="video/mp4" />
+    </video>
+  </ion-card>
+  <!--list of topics-->
+  <ion-list *ngIf="topics">
+    <ion-card *ngFor="let topic of topics">
       <ion-card-header>
         <ion-row>
           <ion-col>
-            <ion-thumbnail wight=80px height=80px item-left (click)="profilePick($event, commant)">
-              <img [src]="commant.img" />
-            </ion-thumbnail>
+            <ion-avatar item-left (click)="profilePick($event, topic)">
+              <img [src]="topic.img" />
+            </ion-avatar>
           </ion-col>
           <ion-col>
-            <h2>{{commant.userDetails.fullName + ": " + commant.title}}</h2>
-            <p>{{commant.date | date:'medium'}}</p>
+            <h2>{{topic.userDetails.fullName + ": " + topic.title}}</h2>
+            <p>{{topic.date | date:'medium'}}</p>
           </ion-col>
         </ion-row>
       </ion-card-header>
       <ion-card-content>
-        <p class="item item-text-wrap" (click)="showFullComment($event, commant)">{{commant.summary? (commant.contnet) : (commant.contnet | shorten: 300) }}</p>
+        <p class="item item-text-wrap" (click)="showFullTopicContent(topic)">{{topic.isShowFullTopicContent? (topic.content) : (topic.content | shorten: 300) }}</p>
       </ion-card-content>
-      <ion-row>
-        <ion-col>
-          <button ion-button icon-left clear small (click)="like($event, commant)">
-            <ion-icon [name]="commant.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'"></ion-icon>
-            <p>like<p>
-              
-
+      <ion-item>
+        <ion-row>
+          <ion-col>
+            <button ion-button icon-left clear small (click)="likeTopic(topic)">
+            <ion-icon [name]="topic.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'"></ion-icon>
+            {{topic.isLiked? 'you and' : '' }} {{topic.likeCounter}} {{topic.isLiked? 'more' : '' }} likes this<p>
           </button>
-        </ion-col>
-        <ion-col>
-          <button ion-button icon-left clear small (click)="commentOnComment($event, commant)">
+          </ion-col>
+          <ion-col>
+            <button ion-button icon-left clear small (click)="showCommentSection(topic)">
             <ion-icon name="text"></ion-icon>
-            <p>comments</p>
+            <p> {{topic.commentCounter}} comments</p>
           </button>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <p (click)="showAllLikes(commant)">{{commant.votesCounter}} likes {{commant.isLiked? 'you' : '' }} 
-            {{commant.showAllLikes? (commant.fullNameString) : (commant.fullNameString | shorten: 10) }} 
-        </p>
-      </ion-row>
-
+          </ion-col>
+        </ion-row>
+      </ion-item>
+      <!--comments under topic-->
+      <ion-card>
+        <ion-list *ngIf="topic.IscommentSection">
+          <ion-card *ngFor="let comment of topic.commentsToShow">
+            <ion-card-header>
+              <ion-row>
+                <ion-col>
+                  <ion-avatar item-left (click)="profilePick($event, topic)">
+                    <img [src]="comment.userDetails.img" />
+                  </ion-avatar>
+                </ion-col>
+                <ion-col>
+                  <h2>{{comment.userDetails.fullName}}</h2>
+                  <p>{{comment.date | date:'medium'}}</p>
+                </ion-col>
+              </ion-row>
+            </ion-card-header>
+            <ion-card-content>
+              <p class="item item-text-wrap" (click)="showFullcommentContent(comment)">
+                {{comment.isShowFullCommentContent? (comment.content) : (comment.content | shorten: 300) }}</p>
+            </ion-card-content>
+            <div>
+              <button ion-button icon-left clear small (click)="likeComment(comment)">
+              <ion-icon [name]="comment.isLiked? 'thumbs-up' :'ios-thumbs-up-outline'"></ion-icon>
+              {{comment.isLiked? 'you and' : '' }} {{comment.likeCounter}} {{comment.isLiked? 'more' : '' }} likes this
+            </button>
+            </div>
+          </ion-card>
+        </ion-list>
+        <!--last raw - add comment-->
+        <ion-card *ngIf="(topic.IscommentSection && user)">
+          <ion-card-header>
+            <ion-row>
+              <ion-col>
+                <ion-avatar item-left (click)="profilePick($event, topic)">
+                  <img [src]="user.img" />
+                </ion-avatar>
+              </ion-col>
+              <ion-col>
+                <h2>{{user.fullName}}</h2>
+              </ion-col>
+            </ion-row>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label floating>add comment</ion-label>
+              <ion-input type="text" [(ngModel)]="topic.newComment"> </ion-input>
+            </ion-item>
+            <button ion-button item-right icon-only (click)="addComment(topic)">
+                <ion-icon name="create"></ion-icon>
+            </button>
+          </ion-card-content>
+        </ion-card>
+        <!--last raw add comment-->
+      </ion-card>
+      <!--comment section-->
     </ion-card>
+    <!--topic-->
   </ion-list>
-  <ion-card *ngIf="!commants">
-    <h2>loading...</h2>
-    <img [src]="assets/images/ring.gif" />
-  </ion-card>
-  <ion-item *ngIf="!commants"> no commants to show </ion-item>
-  <ion-fab right bottom>
-    <button ion-fab color="primary"><ion-icon name="create" (click)="createComment()"></ion-icon></button>
-  </ion-fab>
+
+  <ion-item *ngIf="!topics"> no topic to show </ion-item>
+
 </ion-content>

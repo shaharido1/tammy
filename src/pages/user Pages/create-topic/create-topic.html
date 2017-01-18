@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>New Comment</ion-title>
+    <ion-title>New Topic</ion-title>
     <!--<ion-buttons start>
       <button ion-button (click)="cancelNewComment()">
         <ion-icon name="arrow-back"></ion-icon> Cancel
@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content padding>
-  <form [formGroup]="createCommentForm" (ngSubmit)="onSubmit(createCommentForm.value)">
+  <form [formGroup]="createTopicForm" (ngSubmit)="onSubmit(createTopicForm.value)">
       <!--title-->
     <ion-item [class.error]="!title.valid && title.touched">
       <ion-label floating>title</ion-label>
@@ -29,6 +29,6 @@
     <br/><br/>
     <br/><br/>
 
-    <button ion-button type="submit" class="custom-button" [disabled]="!createCommentForm.valid" block>Submit</button>
+    <button ion-button type="submit" class="custom-button" [disabled]="!createTopicForm.valid" block>Submit</button>
   </form>
 </ion-content>

@@ -46,16 +46,19 @@ export class LoginPage implements OnInit {
         password: logInfilledForm.password
       }).then((auth: FirebaseAuthState) => {
         console.log("log in succussfuly with user key" + auth.uid)
-        this.authService.getUserData(auth)
-          .then((user: IUser) => {
+        let sub = this.authService.getCurrentUser()
+          .subscribe((user: IUser) => {
             console.log("user data return from Db" + user.fullName)
             loader.dismiss()
-              .then(() => {this.onSuccess()})
-              .catch((()=>console.log("problem in dismissing1")))
-            }).catch(err=> console.log("can't get user data"))
+              .then(() => {  this.onSuccess(); sub.unsubscribe(); })
+              .catch((() => console.log("problem in dismissing1")))
+          }, err => console.log("can't get user data"))
       }).catch(err => loader.dismiss()
-      .then(err => console.log("can't auth"))
-      .catch(() => console.log("problem in dismissing2")))
+        .then(err => {
+          this.onFail(err)
+          console.log("can't auth")
+        })
+        .catch(() => console.log("problem in dismissing2")))
     }).catch((err) => loader.dismiss().catch(() => console.log("problem in dismissing2")))
   }
 
@@ -72,7 +75,7 @@ export class LoginPage implements OnInit {
   onFail(err) {
     console.log(err)
     let errMessage: string;
-    errMessage = (err.code == "auth/user-not-found") ? "this user doesn't" : "fail to log in"
+    errMessage = (err.code == "auth/user-not-found") ? "email/password incorrect" : "fail to log in"
     let toasterror = this.toastController.create({
       message: errMessage,
       duration: 3000,
@@ -81,13 +84,12 @@ export class LoginPage implements OnInit {
     toasterror.present()
   }
 
-  toTabPage() {
-    this.navCtrl.setRoot(MyApp)
-  }
-
-
   goToSignUpPage() {
     this.navCtrl.push(SignUpPage)
+  }
+
+  ngOnDestroy() {
+    console.log("destroy login")
   }
 }
 

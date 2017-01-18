@@ -10,7 +10,7 @@ import { Events } from 'ionic-angular';
   selector: 'page-cards',
   templateUrl: 'favorites-cards.html'
 })
-export class FavoritesCardsPage implements OnInit {
+export class FavoritesCardsPage implements OnInit, OnDestroy {
   favoriteCards: Array<ICard> = []
   queryText: string = ""
   user: IUser;
@@ -26,7 +26,6 @@ export class FavoritesCardsPage implements OnInit {
     private toastController: ToastController,
     private events: Events) {
     console.log("in constructor")
-    this.events.subscribe(EventsTypes.userUpdated, () => this.ngOnInit())
   }
 
 
@@ -38,15 +37,22 @@ export class FavoritesCardsPage implements OnInit {
     });
     this.loader.present()
       .then(() => {
-        this.authService.getCurrentUser()
-          .then(user => {
+        this.subscription= this.authService.getCurrentUser()
+          .subscribe(user => {
           console.log("subscribe to user")
-          debugger
             this.user = user
             this.isUser = true;
             this.loader.dismiss().catch(() => console.log("error in dismissing"))
           })
-      }).catch(err => console.log("can't get user" + err))
+      }, err => console.log("can't get user" + err))
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe()
+  }
+  goToCard(card){
+    this.navCtrl.push(CardDetailsPage, card)
+
   }
   refreshAll(refresher) {
     refresher.complete()

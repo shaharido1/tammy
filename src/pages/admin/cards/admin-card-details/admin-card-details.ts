@@ -26,7 +26,7 @@ export class AdminCardDetailsPage implements OnInit, OnDestroy {
   card: ICard = { 
     allocatedUsers: [],
     category: " ",
-    commants: [],
+    topics: [],
     urlToFile: "",
     name: "",
     key: ""
@@ -65,11 +65,12 @@ export class AdminCardDetailsPage implements OnInit, OnDestroy {
     })
     loader.present().then(() => {
       //get date from server
-      this.categories = this.dataService.getCategories()
+      this.dataService.getCategories().then((categories)=>{
+        this.categories
+      }).catch((err)=>console.log(err))
       this.subscription=this.dataService.getAllUsers()
         .subscribe((res) => {
           console.log("users" + res)
-          debugger
           this.allUsers = res
           this.mapUsersForTuggole()
           this.sortUsers()
@@ -133,7 +134,7 @@ export class AdminCardDetailsPage implements OnInit, OnDestroy {
   pushUserToCard(event, user) {
     //have to init the array on the funciton
     if (!this.card.allocatedUsers) { this.card.allocatedUsers = [] }
-    event ? this.card.allocatedUsers.push({ key: user.key, fullName: user.fullName })
+    event ? this.card.allocatedUsers.push({ key: user.key, fullName: user.fullName, img: user.img })
       : this.card.allocatedUsers = this.card.allocatedUsers
         .filter(cardUser => cardUser.key !== user.key)
   }

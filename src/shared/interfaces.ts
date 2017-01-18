@@ -8,11 +8,13 @@ export class IUser {
     email: string;
     phone: string;
     allocatedCards?: Array<IRefCard> 
-    counterComments?: Number
-    commants?: Array<ICommantRef>
+    counterTopics?: Number
+    ownTopics?: Array<IRefTopic>
+    likedTopics?: Array<IRefTopic>
+    ownComments? : Array<IRefComment>
+    likedComments? : Array<IRefComment>
     fullName: string;
     favoriteCards? : Array<IRefCard>
-    votes? : Array<ICommantRef>
     img? : string
 }
 
@@ -20,11 +22,14 @@ export interface ISchool {
     key: string
     name : string
 }
-
-export interface ICommantRef {
+export interface Icategories {
+    name: string
+}
+export interface IRefTopic {
     key: string
     title : string
 }
+
 
 export interface IRefCard {
     key: string
@@ -32,22 +37,57 @@ export interface IRefCard {
     category : string
 }
 
+export interface IRefComment {
+    key : string,
+    content : string
+}
+
+
 export interface IRefUser {
     key: string 
     fullName: string
+    img? : string
 
 }
 
-export interface IComment {
-    votes? : Array<IRefUser>,
-    votesCounter? : number,
+export interface ITopic {
+    likes? : Array<IRefUser>
+    likeCounter? : number
     key?: string
     userDetails?: IRefUser
     img? : string
     cardDetails?: IRefCard
     title: string
-    contnet: string
+    content: string
     date : string;
+    comments? : Array<IRefComment>
+    commentCounter? : number
+}
+
+export interface ITopicToShow extends ITopic {
+    IsShowAllLikes : boolean
+    isShowFullTopicContent : boolean
+    IscommentSection : boolean
+    isLiked : boolean
+    fullNameString : string
+    newComment : string
+    commentsToShow? : Array<IComment>
+}
+export interface IComentToShow extends IComment {
+    IsShowAllLikes : boolean
+    isShowFullCommentContent : boolean
+    isLiked : boolean
+    fullNameString : string
+}
+export interface IComment {
+    key?: string
+    userDetails: IRefUser
+    cardDetails : IRefCard
+    topicDetails: IRefTopic
+    content: string
+    date : string;
+    likes? : Array<IRefUser>,
+    likesCounter? : number,
 }
 
 export interface ICard {
@@ -56,7 +96,7 @@ export interface ICard {
     category: string;
     urlToFile: string
     allocatedUsers: Array<IRefUser>
-    commants: Array<ICommantRef>
+    topics: Array<IRefTopic>
 }
 
 
@@ -76,9 +116,14 @@ export const Paths = {
     infoConnected: ".info/connected",
     allocatedUsers:"allocatedUsers",
     allocatedCards: "allocatedCards",
-    commants: "commants",
+    topics: "topics",
     admins: "admins",
-    votes: "votes"
+    likes: "likes",
+    likedTopics : "likedTopics",
+    ownTopics : "ownTopics",
+    ownComments : "ownComments",
+    comments : "comments",
+    likedComments : "likedComments"
 }
 
 export const EventsTypes = {
@@ -87,12 +132,15 @@ export const EventsTypes = {
     networkConnected: "networkConnected",
     networkDisconnected: "networkDisconnected",
     userUpdated : "userUpdated",
+    userConnected : "userConnected",
+    userDisconnected : "userDisconnected",
     cardUpdated : "cardUpdated",
     userIsAdmin : "userIsAdmin",
-    commentCreated: "commentCreated"
+    topicCreated: "topicCreated"
 }
 
 export const storageKeys = {
     categories : "categories",
-    user : "user"
+    user : "user",
+    auth : "auth"
 }

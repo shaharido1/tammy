@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IUser, Paths, IRefUser, IRefCard, ISchool, ICard, IComment, ICommantRef } from './../interfaces'
+import { IUser, Paths, IRefUser, IRefCard, ISchool, ICard, ITopic, IRefTopic, IComment, IRefComment } from './../interfaces'
 
 export class MappingService {
 
@@ -10,11 +10,7 @@ export class MappingService {
 
         }
         userToSet = {
-            allocatedCards: user.allocatedCards ? MappingService.arrangeCardsToArray(user.allocatedCards) : [],
-            commants: user.commants ? MappingService.arrangeCommantsToArray(user.commants) : [],
-            counterComments: user.commants ? Object.keys(user.commants).length : 0,
-            favoriteCards: user.favoriteCards ? MappingService.arrangeCardsToArray(user.favoriteCards) : [],
-            votes: user.votes? MappingService.arrangeCommantsToArray(user.votes) : [],
+            key: user.$key, //this is the Uid from the auth      
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
@@ -22,8 +18,17 @@ export class MappingService {
             school: user.school,
             username: user.username,
             fullName: user.firstName + " " + user.lastName,
-            key: user.$key, //this is the Uid from the auth      
-            img : user.img? user.img : ""
+            img: user.img ? user.img : "",
+
+            allocatedCards: user.allocatedCards ? MappingService.arrangeCardsToArray(user.allocatedCards) : [],
+            favoriteCards: user.favoriteCards ? MappingService.arrangeCardsToArray(user.favoriteCards) : [],
+
+            ownTopics: user.ownTopics ? MappingService.arranTitleNKeyToArray(user.ownTopics) : [],
+            likedTopics: user.likedTopics ? MappingService.arranTitleNKeyToArray(user.likedTopics) : [],
+            
+            ownComments: user.ownComments ? MappingService.arrangeCommentsIntoArray(user.ownComments) : [],
+            likedComments: user.likedComments ? MappingService.arrangeCommentsIntoArray(user.likedComments) : [],
+
         }
         return userToSet
     }
@@ -32,11 +37,15 @@ export class MappingService {
         let userToSet = {}
         Object.assign(userToSet, user)
         userToSet["key"] = null
-        userToSet["allocatedCards"] = MappingService.arrangeCardsToObject(user.allocatedCards)
-        userToSet["favoriteCards"] = MappingService.arrangeCardsToObject(user.favoriteCards)
-        userToSet["commants"]=MappingService.arragneCommantToObject(user.commants)
+        userToSet["allocatedCards"] = user.allocatedCards ? MappingService.arrangeCardsToObject(user.allocatedCards) : []
+        userToSet["favoriteCards"] = user.favoriteCards ? MappingService.arrangeCardsToObject(user.favoriteCards) : []
+        userToSet["ownTopics"] = user.ownTopics ? MappingService.arragneTitleNKeyinToObject(user.ownTopics) : []
+        userToSet["likedTopics"] = user.likedTopics ? MappingService.arragneTitleNKeyinToObject(user.likedTopics) : []
+        userToSet["ownComments"] = user.ownComments ? MappingService.arragneJustKeyIntoObject(user.ownComments) : []
+        userToSet["likedComments"] = user.likedComments ? MappingService.arragneJustKeyIntoObject(user.likedComments) : []
         return userToSet
     }
+
     ////////////////////////////cards///////////////////////////////////////////////////////////////
 
     static mapCardfromAppToDb(card: ICard) {
@@ -44,8 +53,8 @@ export class MappingService {
         let cardToSet = {}
         Object.assign(cardToSet, card)
         cardToSet["key"] = null
-        cardToSet["allocatedUsers"] = MappingService.arrangeUsersToObject(card.allocatedUsers)
-        cardToSet["commants"]=MappingService.arragneCommantToObject(card.commants)
+        cardToSet["allocatedUsers"] = card.allocatedUsers ? MappingService.arrangeUsersToObject(card.allocatedUsers) : null
+        cardToSet["topics"] = card.topics ? MappingService.arragneTitleNKeyinToObject(card.topics) : null
         return cardToSet
     }
 
@@ -55,41 +64,59 @@ export class MappingService {
             name: card.name,
             allocatedUsers: card.allocatedUsers ? MappingService.arrangeUsersToArray(card.allocatedUsers) : [],
             category: card.category,
-            commants: card.commants ? MappingService.arrangeCommantsToArray(card.commants) : [],
+            topics: card.topics ? MappingService.arranTitleNKeyToArray(card.topics) : [],
             urlToFile: card.urlToFile ? card.urlToFile : ""
         })
 
     }
 
-    ////////////////////////////commant///////////////////////////////////////////////////////////////
+    ////////////////////////////topic///////////////////////////////////////////////////////////////
 
-    static mapCommantFromDbToApp(commant): IComment {
-        debugger
+    static maptopicFromDbToApp(topic): ITopic {
         return ({
-            cardDetails: commant.cardDetails,
-            contnet: commant.contnet,
-            date: commant.date,
-            key: commant.$key,
-            title: commant.title,
-            userDetails: commant.userDetails,
-            img : commant.img? commant.img : null,
-            votes: commant.votes? MappingService.arrangeUsersToArray(commant.votes) : [],
-            votesCounter: commant.votes? Object.keys(commant.votes).length : 0  
+            cardDetails: topic.cardDetails,
+            content: topic.content,
+            date: topic.date,
+            key: topic.$key,
+            title: topic.title,
+            userDetails: topic.userDetails,
+            img: topic.img ? topic.img : null,
+
+            comments: topic.comments ? MappingService.arrangeCommentsIntoArray(topic.comments) : [],
+            commentCounter: topic.comments ? Object.keys(topic.comments).length : 0,
+
+            likes: topic.likes ? MappingService.arrangeUsersToArray(topic.likes) : [],
+            likeCounter: topic.likes ? Object.keys(topic.likes).length : 0,
         })
     }
 
+    ////////////////////////////comment///////////////////////////////////////////////////////////////
+
+    static mapCommentFromDbToApp (commentObject): IComment {
+        return ({
+                key: commentObject.$key,
+                cardDetails : commentObject.cardDetails,
+                topicDetails: commentObject.topicDetails,
+                userDetails: commentObject.userDetails,
+                content: commentObject.content,
+                date: commentObject.date,
+                likes: commentObject.likes ? MappingService.arrangeUsersToArray(commentObject.likes) : [],
+                likesCounter: commentObject.likes ? Object.keys(commentObject.likes).length : 0,
+        })
+    }
     ////////////////////////////school///////////////////////////////////////////////////////////////
 
     static mapSchoolfromDbToApp(school): ISchool {
         return ({ key: school.$key, name: school.name })
     }
+
     ////////////////////////////categories///////////////////////////////////////////////////////////////
-    static mapCategoriesObjectIntoArray(categories) : Array<{name : string}> {
-        let catArray : Array<{name : string}> =[]
+    static mapCategoriesObjectIntoArray(categories): Array<{ name: string }> {
+        let catArray: Array<{ name: string }> = []
         categories.
-        Object.keys(categories).forEach(ky=>{
-            catArray.push({name : ky})
-        })
+            Object.keys(categories).forEach(ky => {
+                catArray.push({ name: ky })
+            })
         return catArray
     }
     ////////////////////////////references///////////////////////////////////////////////////////////////
@@ -97,46 +124,61 @@ export class MappingService {
     private static arrangeUsersToArray(allocatedUsers): Array<IRefUser> {
         let userArray: Array<IRefUser> = []
         Object.keys(allocatedUsers).forEach(ky => {
-            userArray.push({ key: ky, fullName: allocatedUsers[ky].fullName })
+            userArray.push({ key: ky, fullName: allocatedUsers[ky].fullName, img: allocatedUsers[ky].img})
         })
         return userArray
     }
+
     private static arrangeUsersToObject(userArray: Array<IRefUser>): Object {
         let userObj = {}
         userArray.map(user => {
-            userObj[user.key] = { fullName: user.fullName }
+            userObj[user.key] = { fullName: user.fullName, img : user.img }
         })
         return userObj
     }
-    
-    static userRefToCard(user: IUser): IRefUser {
-        return ({ key: user.key, fullName: user.fullName })
-    }
 
-    /////////////commant///////////
-    private static arrangeCommantsToArray(commants): Array<ICommantRef> {
-        let commantsArray: Array<ICommantRef> = []
-        Object.keys(commants).forEach(ky => {
-            commantsArray.push({ key: ky, title: commants[ky].title })
+    /////////////topic///////////
+    private static arranTitleNKeyToArray(topics): Array<IRefTopic> {
+        let topicsArray: Array<IRefTopic> = []
+        Object.keys(topics).forEach(ky => {
+            topicsArray.push({ key: ky, title: topics[ky].title })
         })
-        return commantsArray
+        return topicsArray
     }
 
-    private static arragneCommantToObject(commantArray: Array<ICommantRef>): Object {
-        let commantObj = {}
-        commantArray.map(commant => {
-            commantObj[commant.key] = { title: commant.title }
+    private static arragneTitleNKeyinToObject(topicArray: Array<IRefTopic>): Object {
+        debugger
+        let topicObj = {}
+        topicArray.map(topic => {
+            topicObj[topic.key] = { title: topic.title }
         })
-        return commantObj
+        return topicObj
     }
 
-    
+    private static arragneJustKeyIntoObject(comments: Array<IRefComment>): Object {
+        debugger
+        let commentObj = {}
+        comments.map(com => {
+            commentObj[com.key] = {content : com.content}
+        })
+        return commentObj
+    }
+
+    private static arrangeCommentsIntoArray(comments): Array<IRefComment> {
+        let commentsArray: Array<IRefComment> = []
+        Object.keys(comments).forEach(ky => {
+            commentsArray.push({key: ky, content: comments[ky].content})
+        })
+        return commentsArray
+    }
+
+
 
     ///////////cards array<>object///////////////////
     private static arrangeCardsToArray(allocatedCards): Array<IRefCard> {
         let cardArray: Array<IRefCard> = []
         Object.keys(allocatedCards).forEach(ky => {
-            cardArray.push({key: ky, name: allocatedCards[ky].name, category: allocatedCards[ky].category})
+            cardArray.push({ key: ky, name: allocatedCards[ky].name, category: allocatedCards[ky].category })
         })
         return cardArray
     }
@@ -148,5 +190,7 @@ export class MappingService {
         })
         return cardObj
     }
+
+ 
 
 }

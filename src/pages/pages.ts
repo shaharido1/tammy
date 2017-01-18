@@ -10,7 +10,7 @@ export * from './user Pages/tabs/profile/profile'
 export * from './user Pages/about/about'
 export * from './user Pages/all-cards-list/all-cards-list'
 export * from './user Pages/card-details/card-details'
-export * from './user Pages/create-commant/create-commant'
+export * from './user Pages/create-topic/create-topic'
 ///admin pages
 export * from './admin/cards/admin-cards-list/admin-cards-list'
 export * from './admin/cards/admin-card-details/admin-card-details'

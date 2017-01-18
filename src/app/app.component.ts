@@ -1,9 +1,10 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Nav, Platform, MenuController, Events } from 'ionic-angular';
 import { Network, StatusBar, Splashscreen } from 'ionic-native';
-import { EventsTypes } from './../shared/interfaces'
+import { EventsTypes, storageKeys } from './../shared/interfaces'
 import { DataService, AuthService } from './../shared/providers/providers'
 import { LoginPage, TabsPage, AdminCardsListPage, AboutPage, SchoolListPage, AdminUsersListPage, AllcardsListPage } from './../pages/pages';
+import { Storage } from '@ionic/storage';
 
 @Component({
   templateUrl: 'app.html'
@@ -19,8 +20,8 @@ export class MyApp implements OnInit {
     public authService: AuthService,
     public dataService: DataService,
     public menu: MenuController,
-    public events: Events) 
-    {
+    public events: Events,
+    public storage: Storage) {
     this.initializeApp();
 
     this.userPages = [
@@ -45,7 +46,7 @@ export class MyApp implements OnInit {
       //plashscreen - where the app is loded. change "resource", and config.xml
       Splashscreen.show();
       //monitor connection throught the app
-      this.watchForConnection();
+      this.watchForConnection()
       this.watchForDisconnect();
       //our own sqlite service init
       //if you need to do platform specific things.. 
@@ -87,7 +88,7 @@ export class MyApp implements OnInit {
 
   ngOnInit() {
     var that = this
-    this.authService.getCurrentUser().then((user) => {
+    let sub = this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
         this.rootPage = TabsPage
         this.menu.close()
@@ -101,7 +102,10 @@ export class MyApp implements OnInit {
           }).catch((err) => console.log(err + "error in admin identification proccess"))
       }
       else { this.rootPage = LoginPage }
-    }).catch(err => console.log(err + "err in loging"))
+    }, err => {
+    this.rootPage = LoginPage
+    console.log(err + "err in loging")
+  })
   }
 
   openPage(page) {
@@ -110,9 +114,14 @@ export class MyApp implements OnInit {
 
   signout() {
     this.authService.logOutUser().then(() => {
-      this.admin = false
-      this.menu.close()
-      this.nav.setRoot(LoginPage)
+      Promise.all([this.storage.remove(storageKeys.user), this.storage.remove(storageKeys.auth)])
+        .then(() => {
+           this.admin = false
+          this.menu.close()
+          this.nav.setRoot(LoginPage)
+
+        })
+         //this.events.publish(EventsTypes.userDisconnected)
     }).catch((err) => console.log(err))
   }
 }

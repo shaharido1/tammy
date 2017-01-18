@@ -1,21 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Events, NavController, ToastController, NavParams, LoadingController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { DataService, AuthService } from './../../../shared/providers/providers'
-import { ICard, IUser, IComment, EventsTypes } from './../../../shared/interfaces'
+import { ICard, IUser, ITopic, EventsTypes } from './../../../shared/interfaces'
 import { CardDetailsPage } from './../../pages'
+import { Subscription } from 'rxjs/Subscription'
+
 @Component({
-  selector: 'page-create-commant',
-  templateUrl: 'create-commant.html'
+  selector: 'page-create-topic',
+  templateUrl: 'create-topic.html'
 })
-export class CreateCommantPage {
+export class CreateTopicPage implements OnInit, OnDestroy {
 
 
-  createCommentForm: FormGroup;
+  createTopicForm: FormGroup;
   title: AbstractControl;
   content: AbstractControl;
   card: ICard
   user: IUser
+  subscription: Subscription
+
   constructor(public nav: NavController,
     public navParams: NavParams,
     public fb: FormBuilder,
@@ -29,50 +33,49 @@ export class CreateCommantPage {
   ngOnInit() {
     this.card = this.navParams.data
     this.getUser()
-    this.createCommentForm = this.fb.group({
+    this.createTopicForm = this.fb.group({
       'title': ['', Validators.compose([Validators.required, Validators.minLength(3)])],
       'content': ['', Validators.compose([Validators.required, Validators.minLength(10)])]
     });
-    this.title = this.createCommentForm.controls['title'];
-    this.content = this.createCommentForm.controls['content'];
+    this.title = this.createTopicForm.controls['title'];
+    this.content = this.createTopicForm.controls['content'];
   }
-
+  ngOnDestroy(){
+    this.subscription.unsubscribe()
+  }
   getUser() {
-    this.authService.getCurrentUser()
-      .then(user => this.user = user)
-      .catch(err => console.log("problem in auth"))
+    this.subscription = this.authService.getCurrentUser()
+      .subscribe(
+        user => this.user = user
+      ,err => console.log("problem in auth"))
   }
 
-  cancelNewComment() {
-    console.log("cancel")
-    this.nav.pop()
-  }
-
-  onSubmit(commentForm: any): void {
+  onSubmit(topicForm: any): void {
     if (this.user) {
       let loader = this.loadingCtrl.create({
-        content: 'Posting comment...',
+        content: 'Posting topic...',
       });
       loader.present().then(() => {
-        let newComment: IComment = {
-          title: commentForm.title,
-          contnet: commentForm.content,
-          userDetails: { key: this.user.key, fullName: this.user.fullName },
+        let newTopic: ITopic = {
+          title: topicForm.title,
+          content: topicForm.content,
+          userDetails: { key: this.user.key, fullName: this.user.fullName, img: this.user.img},
           cardDetails: { key: this.card.key, name: this.card.name, category: this.card.category },
           img: this.user.img ? this.user.img : null,
           date: new Date().toString()
         };
-        this.dataService.setNewCommant(newComment)
+        this.dataService.setNewtopic(newTopic)
           .then(() => {
             loader.dismiss()
               .then(() => {
-                this.events.publish(EventsTypes.commentCreated)
+                this.events.publish(EventsTypes.topicCreated)
+                this.events.publish(EventsTypes.userUpdated)
                 this.nav.pop()
               })
               .catch((err) => console.log(err))
           })
           .catch((err) => {
-            console.log(err + "err creating commant")
+            console.log(err + "err creating topic")
             loader.dismiss().catch(err => console.log(err))
           })
       })
