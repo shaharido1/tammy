@@ -23,7 +23,7 @@ export class DataService {
     usersRef: any
     user: IUser
     public connected: boolean = false;
-    
+
     constructor(private angularFire: AngularFire, public events: Events, public storage: Storage) {
         this.initialaizeService()
         console.log("entered data service")
@@ -68,8 +68,10 @@ export class DataService {
 
 
     getUserByKey(key: string): Observable<IUser> {
-        return this.angularFire.database.object(`${Paths.users}/${key}`).map(user =>
-        { return MappingService.mapUserfromDbToApp(user) })
+        return new Observable(observer => {
+            this.angularFire.database.object(`${Paths.users}/${key}`).subscribe(user =>
+            { observer.next(MappingService.mapUserfromDbToApp(user)) })
+        })
     }
 
     getAllUsers(): Observable<IUser[]> {
@@ -206,12 +208,14 @@ export class DataService {
 
     ///////////////////////////schools//////////////////////////////////////////////////////////
     getAllSchools(): Observable<ISchool[]> {
-        return this.angularFire.database.list(Paths.schools)
-            .map((res) => {
-                return res.map(school => {
-                    return MappingService.mapSchoolfromDbToApp(school)
+        return new Observable(observer => {
+            this.angularFire.database.list(Paths.schools)
+                .subscribe((res) => {
+                    res.map(school => {
+                        observer.next(MappingService.mapSchoolfromDbToApp(school))
+                    })
                 })
-            })
+        })
     }
     getAllschoolllls(): FirebaseListObservable<ISchool[]> {
         return this.angularFire.database.list(Paths.schools)
@@ -233,19 +237,19 @@ export class DataService {
 
     ///////////////////////////categories//////////////////////////////////////////////////////////
 
-    getCategories() :  Promise<Array<{ name: string }>> {
+    getCategories(): Promise<Array<{ name: string }>> {
         return new Promise((resolve, reject) => {
-        if (this.categories) {resolve(this.categories)}
-        else {
-            let subscription = this.angularFire.database.list(Paths.categories).subscribe((res) => {
-                        subscription.unsubscribe()
-                        this.categories=res
-                        resolve(this.categories)
-            }, err=> reject(err))
-        }
-    })
+            if (this.categories) { resolve(this.categories) }
+            else {
+                let subscription = this.angularFire.database.list(Paths.categories).subscribe((res) => {
+                    subscription.unsubscribe()
+                    this.categories = res
+                    resolve(this.categories)
+                }, err => reject(err))
+            }
+        })
     }
-    
+
     get2Categories(): Promise<Array<{ name: string }>> {
         return new Promise((resolve, reject) => {
             let subscription: Subscription
@@ -315,7 +319,7 @@ export class DataService {
         return this.root.update(upref)
     }
 
-    setNewtopic(topic: ITopic): Promise<any> {
+    setNewtopic(topic : ITopic): Promise<any> {
         return new Promise((resolve, reject) => {
             this.angularFire.database.list(Paths.topics).push(topic).then(
                 (data) => {
