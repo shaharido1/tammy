@@ -67,7 +67,7 @@ export class DataService {
 
 
 
-    getUserByKey(key: string): Observable<IUser> {
+    getUserByKey(key): Observable<IUser> {
         return new Observable(observer => {
             this.angularFire.database.object(`${Paths.users}/${key}`).subscribe(user =>
             { observer.next(MappingService.mapUserfromDbToApp(user)) })
